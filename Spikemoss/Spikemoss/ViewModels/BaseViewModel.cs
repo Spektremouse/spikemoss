@@ -1,23 +1,18 @@
 ﻿using Spikemoss.Models.Gatherers;
 using Spikemoss.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel;
 
 namespace Spikemoss.ViewModels
 {
-    class BaseViewModel
+    class BaseViewModelINotifyPropertyChanged
     {
-        public Server SelectedServer { get; set; }
+        public event PropertyChangedEventHandler PropertyChanged;
 
-        private void CollectHardwareData()
+        protected void OnPropertyChanged(string propertyName)
         {
-            IHardwareGatherer gatherer;
-            HardwareGathererFactory factory = new HardwareGathererFactory();
-            gatherer = factory.CreateHardwareGatherer(SelectedServer.OperatingSystemType);
-            gatherer.GatherHardwareData(SelectedServer);
+            var handler = PropertyChanged;
+            if (handler != null)
+                handler(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }
