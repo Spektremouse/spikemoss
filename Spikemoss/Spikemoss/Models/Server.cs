@@ -14,8 +14,7 @@ namespace Spikemoss.Models
         private string _error;
         private string _fqdn;
         private string _hostname;
-        private string _operatingSystem;
-        private OperatingSystemType _osType;        
+        private OperatingSystemType _operatingSystem;       
         private Hardware _hardware;
         private IPAddress _address;
         private User _user;
@@ -139,7 +138,7 @@ namespace Spikemoss.Models
             }
         }
 
-        public string OperatingSystem
+        public OperatingSystemType OperatingSystem
         {
             get
             {
@@ -149,19 +148,6 @@ namespace Spikemoss.Models
             set
             {
                 _operatingSystem = value;
-            }
-        }
-
-        public OperatingSystemType OperatingSystemType
-        {
-            get
-            {
-                return _osType;
-            }
-
-            set
-            {
-                _osType = value;
             }
         }
 

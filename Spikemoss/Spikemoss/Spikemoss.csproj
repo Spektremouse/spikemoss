@@ -35,6 +35,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="LumenWorks.Framework.IO, Version=3.9.1.0, Culture=neutral, PublicKeyToken=5ad3ea2f85776344, processorArchitecture=MSIL">
+      <HintPath>..\packages\LumenWorksCsvReader.3.9.1\lib\net20\LumenWorks.Framework.IO.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Renci.SshNet, Version=2016.0.0.0, Culture=neutral, PublicKeyToken=1cee9f8bde3db106, processorArchitecture=MSIL">
       <HintPath>..\packages\SSH.NET.2016.0.0\lib\net40\Renci.SshNet.dll</HintPath>
       <Private>True</Private>
@@ -57,10 +61,10 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <ApplicationDefinition Include="App.xaml">
+    <None Include="App.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-    </ApplicationDefinition>
+    </None>
     <Page Include="Views\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -75,6 +79,7 @@
     <Compile Include="DataAccessLayer\OracleSQL.cs" />
     <Compile Include="DataAccessLayer\PostgreSQL.cs" />
     <Compile Include="Models\Cluster.cs" />
+    <Compile Include="Models\ConfigurationIO.cs" />
     <Compile Include="Models\Hardware.cs" />
     <Compile Include="Models\Gatherers\HardwareGathererFactory.cs" />
     <Compile Include="Models\Gatherers\IHardwareGatherer.cs" />
@@ -83,6 +88,8 @@
     <Compile Include="Models\OperatingSystemType.cs" />
     <Compile Include="Models\Server.cs" />
     <Compile Include="Models\User.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="SimpleAES.cs" />
     <Compile Include="ViewModels\BaseViewModel.cs" />
     <Compile Include="Views\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
