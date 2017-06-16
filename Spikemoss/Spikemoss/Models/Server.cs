@@ -152,7 +152,7 @@ namespace Spikemoss.Models
             }
         }
 
-        public OperatingSystemType OsType
+        public OperatingSystemType OperatingSystemType
         {
             get
             {
