@@ -39,6 +39,10 @@
       <HintPath>..\packages\LumenWorksCsvReader.3.9.1\lib\net20\LumenWorks.Framework.IO.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="MySql.Data, Version=6.9.9.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
+      <HintPath>..\packages\MySql.Data.6.9.9\lib\net45\MySql.Data.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Renci.SshNet, Version=2016.0.0.0, Culture=neutral, PublicKeyToken=1cee9f8bde3db106, processorArchitecture=MSIL">
       <HintPath>..\packages\SSH.NET.2016.0.0\lib\net40\Renci.SshNet.dll</HintPath>
       <Private>True</Private>
@@ -73,6 +77,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="DataAccessLayer\DataAccessLayerType.cs" />
     <Compile Include="DataAccessLayer\IDataAccessLayer.cs" />
     <Compile Include="DataAccessLayer\MSSQL.cs" />
     <Compile Include="DataAccessLayer\MySQL.cs" />
@@ -87,9 +92,10 @@
     <Compile Include="Models\Gatherers\WindowsGatherer.cs" />
     <Compile Include="Models\OperatingSystemType.cs" />
     <Compile Include="Models\Server.cs" />
+    <Compile Include="Models\ServerType.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="Program.cs" />
-    <Compile Include="SimpleAES.cs" />
+    <Compile Include="DataAccessLayer\SimpleAES.cs" />
     <Compile Include="ViewModels\BaseViewModel.cs" />
     <Compile Include="Views\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>

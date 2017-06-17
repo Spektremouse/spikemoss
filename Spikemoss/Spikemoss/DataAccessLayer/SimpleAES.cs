@@ -2,7 +2,7 @@
 using System.Security.Cryptography;
 using System.IO;
 
-namespace Spikemoss
+namespace Spikemoss.DataAccessLayer
 {
     public class SimpleAES
     {
