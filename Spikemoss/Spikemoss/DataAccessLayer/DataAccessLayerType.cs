@@ -8,9 +8,9 @@ namespace Spikemoss.DataAccessLayer
 {
     public enum DataAccessLayerType
     {
-        MSSQL,
-        MySQL,
-        OracleSQL,
-        PostgreSQL
+        MSSQL = 1,
+        MySQL = 2,
+        OracleSQL = 3,
+        PostgreSQL = 4
     }
 }

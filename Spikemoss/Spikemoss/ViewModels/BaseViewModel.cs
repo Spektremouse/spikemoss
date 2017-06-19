@@ -2,7 +2,7 @@
 
 namespace Spikemoss.ViewModels
 {
-    class BaseViewModelINotifyPropertyChanged
+    public class BaseViewModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
