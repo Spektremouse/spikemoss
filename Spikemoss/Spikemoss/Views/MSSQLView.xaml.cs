@@ -47,7 +47,7 @@ namespace Spikemoss.Views
 
         private void SaveClick(object sender, RoutedEventArgs e)
         {
-            ProgressWindow win = new ProgressWindow(_viewModel, _viewModel.TestConnection);
+            ProgressWindow win = new ProgressWindow(_viewModel, _viewModel.SaveConnection);
             win.ShowDialog();
         }
 

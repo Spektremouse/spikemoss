@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Spikemoss.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,9 +21,27 @@ namespace Spikemoss.Views
     /// </summary>
     public partial class MainWindow : Window
     {
-        public MainWindow()
+        public MainWindow(MainViewModel _viewmodel)
         {
             InitializeComponent();
+
+            this.DataContext = _viewmodel;
+            _viewmodel.RequestShow += OnRequestShow;
+        }
+
+        private void OnRequestShow(object sender, EventArgs e)
+        {
+            this.Show();
+        }
+
+        private void MainWindowLoaded(object sender, RoutedEventArgs e)
+        {
+            if (Properties.Settings.Default.DataAccessLayerType == 0)
+            {
+                this.Hide();
+                ConfigurationWindow configuration = new ConfigurationWindow();
+                configuration.ShowDialog();
+            }
         }
     }
 }

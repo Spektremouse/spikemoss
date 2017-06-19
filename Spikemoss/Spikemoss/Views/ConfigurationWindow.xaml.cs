@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Spikemoss.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,9 +20,18 @@ namespace Spikemoss.Views
     /// </summary>
     public partial class ConfigurationWindow : Window
     {
+        private ConfigurationViewModel _viewModel;
+
         public ConfigurationWindow()
         {
             InitializeComponent();
+            _viewModel = this.DataContext as ConfigurationViewModel;
+            _viewModel.RequestClose += OnConfigurationFinished;
+        }
+
+        private void OnConfigurationFinished(object sender, EventArgs e)
+        {            
+            this.Close();
         }
     }
 }

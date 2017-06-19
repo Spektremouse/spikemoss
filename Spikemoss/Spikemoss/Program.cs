@@ -1,8 +1,10 @@
 ﻿using Spikemoss.Views;
+using Spikemoss.ViewModels.Communication;
 using System;
 using System.Windows;
 using Spikemoss.Models;
 using Spikemoss.DataAccessLayer;
+using Spikemoss.ViewModels;
 
 namespace Spikemoss
 {
@@ -11,16 +13,10 @@ namespace Spikemoss
         [STAThread]
         public static void Main(string[] args)
         {
-            ConfigurationWindow startup = new ConfigurationWindow();
+            MainViewModel mainViewModel = new MainViewModel();
+            MainWindow mainWindow = new MainWindow(mainViewModel);
             var app = new Application();
-            app.Run(startup);
-                      
-            /*
-            MainWindow mainWindow = new MainWindow();
-
-            var app = new Application();
-
-            app.Run(mainWindow);*/
+            app.Run(mainWindow);                              
         }
     }
 }

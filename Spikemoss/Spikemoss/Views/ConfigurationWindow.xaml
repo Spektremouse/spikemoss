@@ -9,7 +9,7 @@
         xmlns:System="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d"
         Title="Spikemoss Configuration" Height="400" Width="450">
-
+    
     <Window.DataContext>
         <viewmodel:ConfigurationViewModel/>
     </Window.DataContext>

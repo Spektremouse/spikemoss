@@ -69,10 +69,15 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ViewModels\Communication\IMediator.cs" />
+    <Compile Include="ViewModels\Communication\ViewModelMediator.cs" />
     <Compile Include="ViewModels\ConfigurationViewModel.cs" />
+    <Compile Include="ViewModels\DataLayerConfigurationViewModel.cs" />
     <Compile Include="ViewModels\DelegateCommand.cs" />
+    <Compile Include="ViewModels\Communication\IParticipant.cs" />
     <Compile Include="ViewModels\IReportErrors.cs" />
     <Compile Include="ViewModels\IReportProgress.cs" />
+    <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\MSSQLViewModel.cs" />
     <Compile Include="ViewModels\MySQLViewModel.cs" />
     <Compile Include="ViewModels\OracleSQLViewModel.cs" />
@@ -89,7 +94,6 @@
     <Compile Include="Views\OracleSQLView.xaml.cs">
       <DependentUpon>OracleSQLView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\PasswordHelper.cs" />
     <Compile Include="Views\PostgreSQLView.xaml.cs">
       <DependentUpon>PostgreSQLView.xaml</DependentUpon>
     </Compile>
