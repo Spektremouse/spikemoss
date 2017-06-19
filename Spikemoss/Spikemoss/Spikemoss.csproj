@@ -89,6 +89,7 @@
     <Compile Include="Views\OracleSQLView.xaml.cs">
       <DependentUpon>OracleSQLView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\PasswordHelper.cs" />
     <Compile Include="Views\PostgreSQLView.xaml.cs">
       <DependentUpon>PostgreSQLView.xaml</DependentUpon>
     </Compile>

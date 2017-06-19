@@ -8,7 +8,7 @@ namespace Spikemoss.DataAccessLayer
         private string _connectionString;
         private SimpleAES _aes;
         private static MySQL _instance;
-        private const string DATABASE_NAME = "spikemossv2";
+        private const string DATABASE_NAME = "spikemoss";
 
         //Used internally to ensure thready safety by locking a private object
         private static readonly object padlock = new object();

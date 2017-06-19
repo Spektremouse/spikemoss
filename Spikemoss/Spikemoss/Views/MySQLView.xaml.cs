@@ -28,6 +28,9 @@ namespace Spikemoss.Views
         {
             InitializeComponent();
             _viewModel = this.DataContext as MySQLViewModel;
+
+            //Potential Memory Leak
+            //WeakEventManager<IReportErrors, EventArgs>.AddHandler(_viewModel, nameof(_viewModel.ErrorOccurred), OnErrorOccurred);
             _viewModel.ErrorOccurred += OnErrorOccurred;
         }
 
@@ -55,6 +58,19 @@ namespace Spikemoss.Views
             var context = this.DataContext as MSSQLViewModel;
             ProgressWindow win = new ProgressWindow(context, context.TestConnection);
             win.ShowDialog();
+        }
+
+        private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
+        {
+            if (this.DataContext != null)
+            {
+                _viewModel.Password = ((PasswordBox)sender).Password;
+            }
+        }
+
+        private void OnUnloaded(object sender, RoutedEventArgs e)
+        {
+            _viewModel.ErrorOccurred -= OnErrorOccurred;
         }
     }
 }

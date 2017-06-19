@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:Spikemoss.Views"
              xmlns:viewmodel="clr-namespace:Spikemoss.ViewModels"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300">
+             d:DesignHeight="300" d:DesignWidth="300" Unloaded="OnUnloaded">
 
     <UserControl.DataContext>
         <viewmodel:MSSQLViewModel/>
@@ -35,7 +35,7 @@
         <Label Grid.Column="0" Grid.Row="2" VerticalAlignment="Center" >Username:</Label>
         <TextBox Grid.Column="1" Grid.Row="2" Margin="10" Text="{Binding Username}" IsEnabled="{Binding AuthenticationEnabled}"/>
         <Label Grid.Column="0" Grid.Row="3" VerticalAlignment="Center">Password:</Label>
-        <TextBox Grid.Column="1" Grid.Row="3" Margin="10" Text="{Binding Password}" IsEnabled="{Binding AuthenticationEnabled}"/>
+        <PasswordBox Grid.Column="1" Grid.Row="3" Margin="10" PasswordChar="*" IsEnabled="{Binding AuthenticationEnabled}" PasswordChanged="PasswordBox_PasswordChanged"/>
         <Grid Grid.Row="4" Grid.ColumnSpan="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition></ColumnDefinition>

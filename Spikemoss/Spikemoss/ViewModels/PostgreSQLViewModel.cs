@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Npgsql;
+using System.Security;
 
 namespace Spikemoss.ViewModels
 {
@@ -18,9 +19,8 @@ namespace Spikemoss.ViewModels
         private string _connectionString;
         private string _errorMessage;
         private string _statusText = null;
-        private bool _canSave = false;
-
         private string _message;
+        private bool _canSave = false;        
         private int _value;
         private int _port = 5432;
 
@@ -162,6 +162,8 @@ namespace Spikemoss.ViewModels
             builder.Port = Port;
             builder.Username = Username;
             builder.Password = Password;
+
+            Console.WriteLine(builder.ConnectionString);
 
             using (var con = new NpgsqlConnection(builder.ConnectionString))
             {
