@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 
 namespace Spikemoss.Models
 {
@@ -131,7 +132,31 @@ namespace Spikemoss.Models
         /// <param name="filename"></param>
         public void ExportConfiguration(string filename, List<Server> serverList)
         {
+            using (StreamWriter writer = new StreamWriter(filename))
+            {
+                int i = 0;
+                foreach (var header in FILE_HEADERS)
+                {
+                    writer.Write(header);
+                    if (i < FILE_HEADERS.Length - 1)
+                    {
+                        writer.Write(",");
+                    }
+                }
 
+                writer.WriteLine();
+
+                foreach (var server in serverList)
+                {
+                    var builder = new StringBuilder();
+                    builder.Append(server.Hostname).Append(",")
+                        .Append(server.Address).Append(",")
+                        .Append(server.OperatingSystem.ToString()).Append(",")
+                        .Append(server.User.Name);
+
+                    writer.WriteLine(builder.ToString());
+                }
+            }
         }
 
         private bool ValidateHeaders(string[] headerArgs)
