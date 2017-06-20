@@ -37,11 +37,11 @@ namespace Spikemoss.Models
             }
         }
 
-        public IEnumerable<Server> ServerList
+        /*public IEnumerable<Server> ServerList
         {
             get { return _serverList; }
             set { _serverList = value; }
-        }
+        }*/
         #endregion
     }
 }

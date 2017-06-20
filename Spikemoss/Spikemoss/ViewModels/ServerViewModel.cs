@@ -17,9 +17,15 @@ namespace Spikemoss.ViewModels
         private List<Server> _serverList = new List<Server>();
         ObservableCollection<ServerViewModel> _serverViewModelList;
 
-        public ServerViewModel(Server server)
+        public ServerViewModel()
         {
-            _server = server;
+            ViewModelMediator.Instance.Register(this);
+        }
+
+        public Server Server
+        {
+            private get { return _server; }
+            set { _server = value; }
         }
 
         public string Hostname
@@ -41,11 +47,7 @@ namespace Spikemoss.ViewModels
                 string tempMessage = message as string;
                 if (tempMessage == LOAD_COMPLETE_MESSAGE)
                 {
-                    foreach (var server in _serverList)
-                    {
-                        var serverVM = new ServerViewModel(server);
-                        _serverViewModelList.Add(serverVM);
-                    }
+                    
                 }
             }
         }

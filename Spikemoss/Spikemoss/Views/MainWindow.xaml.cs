@@ -1,4 +1,5 @@
-﻿using Spikemoss.ViewModels;
+﻿using Microsoft.Win32;
+using Spikemoss.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -61,7 +62,45 @@ namespace Spikemoss.Views
 
         private void TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            _viewModel.SelectedItem = e.NewValue;
+            _viewModel.SelectedItem = e.NewValue as BaseViewModel;
+        }
+
+        private void ExitClick(object sender, RoutedEventArgs e)
+        {
+            //http://stackoverflow.com/questions/2820357/how-to-exit-a-wpf-app-programmatically
+            //http://stackoverflow.com/questions/5682408/command-to-close-an-application-of-console
+            //logging
+            Application.Current.Shutdown();
+        }
+
+        private void ImportConfigurationClick(object sender, RoutedEventArgs e)
+        {
+            var ofd = new OpenFileDialog();
+            ofd.Filter = "CSV files (*.csv) | *.csv";
+            ofd.CheckFileExists = true;
+            ofd.CheckPathExists = true;
+            var result = ofd.ShowDialog();
+            if (result == true && ofd.FileName != null)
+            {
+                _viewModel.Filepath = ofd.FileName;
+                ProgressWindow win = new ProgressWindow(_viewModel, _viewModel.ImportConfigurationCommand);
+                win.ShowDialog();
+            }
+        }
+
+        private void ExportConfigurationClick(object sender, RoutedEventArgs e)
+        {
+            var sfd = new SaveFileDialog();
+            sfd.Filter = "CSV files (*.csv) | *.csv";
+            sfd.OverwritePrompt = true;
+            sfd.CheckPathExists = true;
+            var result = sfd.ShowDialog();
+            if (result == true && sfd.FileName != null)
+            {
+                _viewModel.Filepath = sfd.FileName;
+                ProgressWindow win = new ProgressWindow(_viewModel, _viewModel.ExportConfigurationCommand);
+                win.ShowDialog();
+            }
         }
     }
 }

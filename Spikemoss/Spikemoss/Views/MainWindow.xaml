@@ -10,61 +10,72 @@
     
     <Window.Resources>
         <DataTemplate DataType="{x:Type viewmodel:ClusterViewModel}">
-            <local:MSSQLView/>
+            <local:ClusterView/>
         </DataTemplate>
         <DataTemplate DataType="{x:Type viewmodel:ServerViewModel}">
-            <local:MySQLView />
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type viewmodel:OracleSQLViewModel}">
-            <local:OracleSQLView />
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type viewmodel:PostgreSQLViewModel}">
-            <local:PostgreSQLView />
+            <local:ServerView />
         </DataTemplate>
     </Window.Resources>
-    
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="13*"/>
-            <RowDefinition Height="74*"/>
-            <RowDefinition Height="13*"/>
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="8*"/>
-            <ColumnDefinition Width="72*"/>
-            <ColumnDefinition Width="8*"/>
-        </Grid.ColumnDefinitions>
-        <Grid Grid.Column="1" Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="22*"/>
-                <ColumnDefinition Width="72*"/>
-            </Grid.ColumnDefinitions>
+    <!--Main menu bar-->
+    <DockPanel>
+        <Menu DockPanel.Dock="Top" Margin="0,0,0,5">
+            <MenuItem Header="File">
+                <MenuItem Header="Import Configuration" Click="ImportConfigurationClick"/>
+                <MenuItem Header="Export Configuration" Click="ExportConfigurationClick"/>
+                <Separator/>
+                <MenuItem Header="Exit" Click="ExitClick"/>
+            </MenuItem>
+            <MenuItem Header="Reporting">
+                <MenuItem Header="Export Hardware Details"/>
+                <MenuItem Header="Export Hardware Cost"/>
+            </MenuItem>
+            <MenuItem Header="Help">
+                <MenuItem Header="About"/>
+            </MenuItem>
+        </Menu>
+        <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="8*"/>
+                <RowDefinition Height="13*"/>
                 <RowDefinition Height="74*"/>
-                <RowDefinition Height="18*"/>
+                <RowDefinition Height="13*"/>
             </Grid.RowDefinitions>
-            <TreeView Grid.Column="0" Grid.Row="1" BorderThickness="1" Margin="4,0,4,0" ItemsSource="{Binding ClusterList}" SelectedItemChanged="TreeView_SelectedItemChanged">
-                <TreeView.Resources>
-                    <HierarchicalDataTemplate DataType="{x:Type viewmodel:ClusterViewModel}" ItemsSource="{Binding ServerList}">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="{Binding Name}"/>
-                        </StackPanel>
-                    </HierarchicalDataTemplate>
-                    <DataTemplate DataType="{x:Type viewmodel:ServerViewModel}">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="{Binding Address}"/>
-                        </StackPanel>
-                    </DataTemplate>
-                </TreeView.Resources>
-            </TreeView>
-            <ContentControl Grid.Column="1" Grid.Row="1" Content="{Binding CurrentView}" />
-            <DockPanel Grid.Column="0" Grid.Row="2">
-                <Button DockPanel.Dock="Left" Margin="5" Width="55" Height="30">Btn1</Button>
-                <Button Margin="5" Width="55" Height="30">Btn2</Button>
-                <Button DockPanel.Dock="Right" Margin="5" Height="30">Btn3</Button>
-            </DockPanel>
-            
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="8*"/>
+                <ColumnDefinition Width="72*"/>
+                <ColumnDefinition Width="8*"/>
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Column="1" Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="22*"/>
+                    <ColumnDefinition Width="72*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="8*"/>
+                    <RowDefinition Height="74*"/>
+                    <RowDefinition Height="18*"/>
+                </Grid.RowDefinitions>
+                <TreeView Grid.Column="0" Grid.Row="1" BorderThickness="1" Margin="4,0,4,0" ItemsSource="{Binding ClusterList}" SelectedItemChanged="TreeView_SelectedItemChanged">
+                    <TreeView.Resources>
+                        <HierarchicalDataTemplate DataType="{x:Type viewmodel:ClusterViewModel}" ItemsSource="{Binding ServerList}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding Name}"/>
+                            </StackPanel>
+                        </HierarchicalDataTemplate>
+                        <DataTemplate DataType="{x:Type viewmodel:ServerViewModel}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding Address}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </TreeView.Resources>
+                </TreeView>
+                <ContentControl Grid.Column="1" Grid.Row="1" Content="{Binding SelectedItem}" />
+                <DockPanel Grid.Column="0" Grid.Row="2">
+                    <Button DockPanel.Dock="Left" Margin="5" Width="55" Height="30">Btn1</Button>
+                    <Button Margin="5" Width="55" Height="30">Btn2</Button>
+                    <Button DockPanel.Dock="Right" Margin="5" Height="30">Btn3</Button>
+                </DockPanel>
+
+            </Grid>
         </Grid>
-    </Grid>
+    </DockPanel>
 </Window>

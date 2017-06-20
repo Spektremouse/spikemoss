@@ -110,7 +110,73 @@ namespace Spikemoss.DataAccessLayer
             return null;
         }
 
-        public void InsertServer(Server server) { }
+        public void InsertServer(Server server)
+        {
+            using (var con = new MySqlConnection(ConnectionString))
+            {
+                con.Open();
+                string query = "INSERT INTO server"
+                        + "(ClusterID,"
+                        + "UserID,"
+                        + "VirtualHostID,"
+                        + "Address,"
+                        + "Hostname,"
+                        + "SSHPort,"
+                        + "Error,"
+                        + "OperatingSystemType,"
+                        + "ServerType,"
+                        + "IsConfigured,"
+                        + "IsVirtual)"
+                        + " VALUES ("
+                        + "@ClusterID,"
+                        + "@UserID,"
+                        + "@VirtualHostID,"
+                        + "@Address,"
+                        + "@Hostname,"
+                        + "@SSHPort,"
+                        + "@Error,"
+                        + "@OperatingSystemType,"
+                        + "@ServerType,"
+                        + "@IsConfigured,"
+                        + "@IsVirtual);"
+                        + "SELECT LAST_INSERT_ID();";
+                var cmd = new MySqlCommand(query, con);
+                
+                if (server.ClusterID == 0)
+                {
+                    cmd.Parameters.AddWithValue("@ClusterID", null);
+                }
+                else
+                {
+                    cmd.Parameters.AddWithValue("@ClusterID", server.ClusterID);
+                }
+                if (server.User.UserID == 0)
+                {
+                    cmd.Parameters.AddWithValue("@UserID", null);
+                }
+                else
+                {
+                    cmd.Parameters.AddWithValue("@UserID", server.User.UserID);
+                }
+                if (server.VirtualHostID == 0)
+                {
+                    cmd.Parameters.AddWithValue("@VirtualHostID", null);
+                }
+                else
+                {
+                    cmd.Parameters.AddWithValue("@VirtualHostID", server.VirtualHostID);
+                }                
+                cmd.Parameters.AddWithValue("@Address", server.Address);
+                cmd.Parameters.AddWithValue("@Hostname", server.Hostname);
+                cmd.Parameters.AddWithValue("@SSHPort", server.SSHPort);
+                cmd.Parameters.AddWithValue("@Error", server.Error);
+                cmd.Parameters.AddWithValue("@OperatingSystemType", server.OperatingSystem.ToString());
+                cmd.Parameters.AddWithValue("@ServerType", server.ServerType.ToString());
+                cmd.Parameters.AddWithValue("@IsConfigured", server.IsConfigured);
+                cmd.Parameters.AddWithValue("@IsVirtual", server.IsVirtual);
+                server.ServerID = Convert.ToInt32(cmd.ExecuteScalar());
+            }
+        }
 
         public void UpdateServer(Server server)
         {
@@ -227,7 +293,25 @@ namespace Spikemoss.DataAccessLayer
             return null;
         }
 
-        public void InsertUser(User user) { }
+        public void InsertUser(User user)
+        {
+            using (var con = new MySqlConnection(ConnectionString))
+            {
+                con.Open();
+                string query = "INSERT INTO user"
+                        + "(Name,"
+                        + "Password)"
+                        + " VALUES ("
+                        + "@Name,"
+                        + "@Password);"
+                        + "SELECT LAST_INSERT_ID();";
+                var cmd = new MySqlCommand(query, con);
+                cmd.Parameters.AddWithValue("@Name", user.Name);
+                cmd.Parameters.AddWithValue("@Password", _aes.EncryptToString(user.Password));
+
+                user.UserID = Convert.ToInt32(cmd.ExecuteScalar());
+            }
+        }
 
         public void UpdateUser(User user)
         {

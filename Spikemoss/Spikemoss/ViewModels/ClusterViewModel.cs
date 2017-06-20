@@ -13,13 +13,19 @@ namespace Spikemoss.ViewModels
     {
         private const string LOAD_COMPLETE_MESSAGE = "LoadComplete";
 
+        private IList<ServerViewModel> _serverListToLoad;
         private Cluster _cluster;
-        ObservableCollection<ServerViewModel> _serverViewModelList;  
+        private ObservableCollection<ServerViewModel> _serverViewModelList;
+        
+        public Cluster CurrentCluster
+        {
+            private get { return _cluster; }
+            set { _cluster = value; }
+        }
 
-        public ClusterViewModel(Cluster cluster)
+        public ClusterViewModel()
         {
             ViewModelMediator.Instance.Register(this);
-            _cluster = cluster;
             _serverViewModelList = new ObservableCollection<ServerViewModel>();
         }
 
@@ -27,6 +33,12 @@ namespace Spikemoss.ViewModels
         {
             get { return _serverViewModelList; }
             set { _serverViewModelList = value; OnPropertyChanged("ClusterList"); }
+        }
+
+        public IList<ServerViewModel> ServerListToLoad
+        {
+            private get { return _serverListToLoad; }
+            set { _serverListToLoad = value; OnPropertyChanged("ClusterList"); }
         }
 
         public int ID
@@ -48,9 +60,8 @@ namespace Spikemoss.ViewModels
                 string tempMessage = message as string;
                 if (tempMessage == LOAD_COMPLETE_MESSAGE)
                 {
-                    foreach (var server in _cluster.ServerList)
+                    foreach (var serverVM in _serverListToLoad)
                     {
-                        var serverVM = new ServerViewModel(server);
                         _serverViewModelList.Add(serverVM);
                     }
                 }

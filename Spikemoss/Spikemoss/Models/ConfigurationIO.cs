@@ -63,7 +63,6 @@ namespace Spikemoss.Models
 
                         while (reader.ReadNextRecord())
                         {
-                            Console.WriteLine(reader.CurrentRecordIndex);
                             unique = true;
                             var server = new Server();
                             server.Hostname = reader[HOSTNAME];
@@ -116,7 +115,7 @@ namespace Spikemoss.Models
                     }
                     else
                     {
-                        throw new ArgumentException();
+                        throw new ArgumentException("File headers do match an importable configuration file.");
                     }
                 }
             }

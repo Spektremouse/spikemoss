@@ -7,97 +7,53 @@ using System.Threading.Tasks;
 using Spikemoss.Models;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Windows.Input;
 
 namespace Spikemoss.ViewModels
 {
-    public class MainViewModel : DataViewModel, IParticipant, IReportErrors
+    public class MainViewModel : DataViewModel, IParticipant, IReportErrors, IReportProgress
     {
         private const string LOAD_COMPLETE_MESSAGE = "LoadComplete";
 
-        private BaseViewModel _cview;
         private string _errorMessage;
+        private string _progressMessage;
+        private int _progressValue;
         private object _selectedItem;
 
-        private BackgroundWorker _worker;
+        private BackgroundWorker _loadWorker;
+        private BackgroundWorker _configurationIOWorker;
         private ObservableCollection<ClusterViewModel> _clusterViewModelList;
         private IList<ClusterViewModel> _clusterList = new List<ClusterViewModel>();
 
         public event EventHandler RequestShow;
         public event ErrorHandler ErrorOccurred;
-       
+        public event ProgressFinishHandler ProgressFinish;
+
         public MainViewModel()
         {
             ViewModelMediator.Instance.Register(this);
 
             _clusterViewModelList = new ObservableCollection<ClusterViewModel>();
 
-            _worker = new BackgroundWorker();
-            _worker.DoWork += LoadDataWork;
-            _worker.RunWorkerCompleted += LoadDataWorkCompleted;
-            _worker.WorkerReportsProgress = true;
-            _worker.ProgressChanged += ProgressChanged;
-            _worker.WorkerSupportsCancellation = true;
-        }
+            _loadWorker = new BackgroundWorker();
+            _loadWorker.DoWork += LoadDataWork;
+            _loadWorker.RunWorkerCompleted += LoadDataWorkCompleted;
+            _loadWorker.WorkerReportsProgress = true;
+            _loadWorker.ProgressChanged += ProgressChanged;
+            _loadWorker.WorkerSupportsCancellation = true;
 
-        public BaseViewModel CurrentView
-        {
-            get { return _cview; }
-            set { _cview = value; OnPropertyChanged("CurrentView"); }
-        }
-
-        private void ProgressChanged(object sender, ProgressChangedEventArgs e)
-        {            
-            //throw new NotImplementedException();
-        }
-
-        private void LoadDataWorkCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            if (e.Error != null)
-            {
-                ErrorOccurred(this, new EventArgs());
-            }
-            foreach (var clustervm in _clusterList)
-            {
-                _clusterViewModelList.Add(clustervm);
-            }
-            SendMessage(ViewModelMediator.Instance, LOAD_COMPLETE_MESSAGE);
-        }
-
-        private void LoadDataWork(object sender, DoWorkEventArgs e)
-        {
-            var unclustered = new Cluster();
-            unclustered.ClusterID = 0;
-            unclustered.Name = "Unclustered";
-
-            var clusters = DataAccessLayer.GetAllClusters();
-            clusters.Add(unclustered);
-            var servers = DataAccessLayer.GetAllServers();
-            var users = DataAccessLayer.GetAllUsers();
-
-            var sortedClusters = clusters.OrderBy(c => c.ClusterID);
-
-            foreach (var server in servers)
-            {
-                server.User = users.SingleOrDefault(user => user.UserID == server.User.UserID);
-                Console.WriteLine(server.ClusterID);
-            }
-
-            foreach (var cluster in sortedClusters)
-            {
-                Console.WriteLine("ClusterID:"+cluster.ClusterID);
-                cluster.ServerList = servers.Where(server => server.ClusterID == cluster.ClusterID);
-                var clusterVm = new ClusterViewModel(cluster);
-                _clusterList.Add(clusterVm);
-            }            
-        }
+            _configurationIOWorker = new BackgroundWorker();
+            _configurationIOWorker.RunWorkerCompleted += ConfigurationIOWorkCompleted;
+            _configurationIOWorker.WorkerReportsProgress = true;
+            _configurationIOWorker.ProgressChanged += ProgressChanged;
+            _configurationIOWorker.WorkerSupportsCancellation = true;
+        }        
 
         public object SelectedItem
         {
             get { return _selectedItem; }
             set { _selectedItem = value; OnPropertyChanged("SelectedItem"); Console.WriteLine(_selectedItem.GetType()); }
         }
-
-        public ObservableCollection<ClusterViewModel> ClusterList { get { return _clusterViewModelList; } set { _clusterViewModelList = value; OnPropertyChanged("ClusterList"); } }
 
         public string ErrorMessage
         {
@@ -110,6 +66,48 @@ namespace Spikemoss.ViewModels
             {
                 _errorMessage = value; OnPropertyChanged("ErrorMessage");
             }
+        }
+
+        public string Filepath
+        {
+            private get;
+            set;
+        }
+
+        public ObservableCollection<ClusterViewModel> ClusterList
+        {
+            get { return _clusterViewModelList; }
+            set { _clusterViewModelList = value; OnPropertyChanged("ClusterList"); }
+        }
+
+        public ICommand ExportConfigurationCommand
+        {
+            get
+            {
+                _configurationIOWorker.DoWork += ExportConfiguration;
+                return new DelegateCommand(_configurationIOWorker.RunWorkerAsync);
+            }
+        }
+
+        public ICommand ImportConfigurationCommand
+        {
+            get
+            {
+                _configurationIOWorker.DoWork += ImportConfiguration;
+                return new DelegateCommand(_configurationIOWorker.RunWorkerAsync);
+            }
+        }
+
+        public string ProgressMessage
+        {
+            get { return _progressMessage;}
+            set { _progressMessage = value; OnPropertyChanged("ProgressMessage"); }
+        }
+
+        public int ProgressValue
+        {
+            get { return _progressValue; }
+            set { _progressValue = value; OnPropertyChanged("ProgressValue"); }
         }
 
         public void ReceiveMessage(object message)
@@ -127,7 +125,115 @@ namespace Spikemoss.ViewModels
 
         public void OnViewReady(object sender, EventArgs e)
         {
-            _worker.RunWorkerAsync();
+            //Listens for an event that signals the ViewModel can begin processing.
+            _loadWorker.RunWorkerAsync();
+        }
+
+        private void ExportConfiguration(object sender, DoWorkEventArgs e)
+        {
+            var manager = new ConfigurationIO();
+
+            ProgressMessage = "Exporting configuration file.";
+            manager.ExportConfiguration(Filepath, DataAccessLayer.GetAllServers());
+        }
+
+        private void ImportConfiguration(object sender, DoWorkEventArgs e)
+        {
+            var manager = new ConfigurationIO();
+
+            manager.ImportConfiguration(Filepath);
+
+            int i = 0;
+            foreach (var server in manager.ServerList)
+            {                
+                ProgressMessage = String.Format("{0}/{1} servers imported.", i, manager.ServerList.Count);
+                DataAccessLayer.InsertServer(server);
+                i++;
+            }
+
+            i = 0;
+            foreach (var user in manager.UserList)
+            {
+                ProgressMessage = String.Format("{0}/{1} servers imported.", i, manager.UserList.Count);
+                DataAccessLayer.InsertUser(user);
+                i++;
+            }
+        }
+
+        private void ConfigurationIOWorkCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            if (e.Error != null)
+            {
+                ErrorMessage = e.Error.Message;
+                ErrorOccurred(this, new EventArgs());
+            }
+            ProgressFinish(this, new EventArgs());
+        }
+
+        private void LoadDataWork(object sender, DoWorkEventArgs e)
+        {
+            //Created a cluster for unsorted servers
+            var unclustered = new Cluster();
+            unclustered.ClusterID = 0;
+            unclustered.Name = "Unclustered";
+
+            //Load in all the data
+            var clusters = DataAccessLayer.GetAllClusters();
+            var servers = DataAccessLayer.GetAllServers();
+            var users = DataAccessLayer.GetAllUsers();
+
+            //Add the placeholder cluster
+            clusters.Add(unclustered);
+
+            //Find and assign each servers user
+            foreach (var server in servers)
+            {
+                server.User = users.SingleOrDefault(user => user.UserID == server.User.UserID);
+            }
+
+            //Sort the loaded clusters
+            var sortedClusters = clusters.OrderBy(c => c.ClusterID);
+
+            foreach (var cluster in sortedClusters)
+            {
+                //Create a list of ServerViewModels which the ClusterViewModel will manage
+                var serverViewModels = new List<ServerViewModel>();
+                //Get a list of servers that belong to a cluster
+                var clusterServers = servers.Where(server => server.ClusterID == cluster.ClusterID);
+
+                foreach (var server in clusterServers)
+                {
+                    //Create the ViewModel that will manage each server instance
+                    var serverViewModel = new ServerViewModel();
+                    serverViewModel.Server = server;
+                    //Add the view model to the current clusters ServerViewModel list
+                    serverViewModels.Add(serverViewModel);
+                }
+                var clusterVm = new ClusterViewModel();
+                clusterVm.CurrentCluster = cluster;
+                clusterVm.ServerListToLoad = serverViewModels;
+                _clusterList.Add(clusterVm);
+            }
+        }
+
+        private void LoadDataWorkCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            if (e.Error != null)
+            {
+                ErrorMessage = e.Error.Message;
+                ErrorOccurred(this, new EventArgs());
+            }
+            foreach (var clustervm in _clusterList)
+            {
+                _clusterViewModelList.Add(clustervm);
+            }
+            //Lets everyone know the app is done loading data from the database
+            SendMessage(ViewModelMediator.Instance, LOAD_COMPLETE_MESSAGE);
+        }        
+
+        private void ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            //throw new NotImplementedException();
         }
     }
 }
