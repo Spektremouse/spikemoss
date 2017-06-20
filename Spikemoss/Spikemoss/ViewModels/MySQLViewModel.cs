@@ -24,21 +24,23 @@ namespace Spikemoss.ViewModels
 
         override protected void SaveWork(object sender, DoWorkEventArgs e)
         {
+            DataAccessLayerFactory factory = new DataAccessLayerFactory();
+            var dal = factory.CreateDataAccessLayer(DataAccessLayerType.MySQL, this.ConnectionString);
+            
             this.SaveWorker.ReportProgress(0, "Starting");
             try
             {
-                DataAccessLayer.ConnectionString = this.ConnectionString;
-                DataAccessLayer.CreateDatabase();
+                dal.CreateDatabase();
+                dal.CreateTables();
                 Properties.Settings.Default.ConnectionString = DataAccessLayer.ConnectionString;
                 Properties.Settings.Default.DataAccessLayerType = (int)DataAccessLayerType.MySQL;
                 Properties.Settings.Default.Save();
-                DataAccessLayer.CreateTables();
                 ProgressMessage = "Done";
                 ProgressValue = 100;
             }
             catch (Exception ex)
             {
-                //TODO Handle Exception
+                ErrorMessage = ex.Message;
             }
             finally
             {

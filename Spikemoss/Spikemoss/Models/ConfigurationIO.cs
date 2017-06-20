@@ -98,6 +98,8 @@ namespace Spikemoss.Models
 
                             server.User = osUser;
 
+                            _users.Add(osUser);
+
                             //decreases performance
                             foreach (var x in _servers)
                             {

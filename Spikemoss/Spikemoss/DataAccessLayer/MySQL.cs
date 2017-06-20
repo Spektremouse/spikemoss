@@ -225,13 +225,13 @@ namespace Spikemoss.DataAccessLayer
                 if (cluster.ClusterID > 0)
                 {
                     var cmd = new MySqlCommand("SELECT * FROM server WHERE ClusterID=@clusterID;", con);
-                    using (MySqlDataReader data = cmd.ExecuteReader())
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
-                        if (data.HasRows)
+                        if (reader.HasRows)
                         {
-                            while (data.Read())
+                            while (reader.Read())
                             {
-                                list.Add(ReadServer(data));
+                                list.Add(ReadServer(reader));
                             }
                         }
                     }
@@ -268,14 +268,14 @@ namespace Spikemoss.DataAccessLayer
             {
                 con.Open();
                 var cmd = new MySqlCommand("SELECT * FROM user;", con);
-                using (MySqlDataReader data = cmd.ExecuteReader())
+                using (MySqlDataReader reader = cmd.ExecuteReader())
                 {
-                    while (data.Read())
+                    while (reader.Read())
                     {
                         var user = new User();
-                        user.UserID = data.GetInt32("UserID");
-                        user.Name = data.GetString("Name");
-                        user.Password = data.GetString("Password");
+                        user.UserID = reader.GetInt32("UserID");
+                        user.Name = reader.GetString("Name");
+                        user.Password = reader.GetString("Password");
                         list.Add(user);
                     }
                 }
@@ -290,7 +290,27 @@ namespace Spikemoss.DataAccessLayer
 
         public User GetUser(int id)
         {
-            return null;
+            var user = new User();
+            using (var con = new MySqlConnection(ConnectionString))
+            {
+                con.Open();
+                string query = "SELECT * FROM user"
+                        + " WHERE UserID=@ID;";
+                var cmd = new MySqlCommand(query, con);
+
+                cmd.Parameters.AddWithValue("@ID", id);
+
+                var reader = cmd.ExecuteReader();
+                if (reader.HasRows)
+                {
+                    while (reader.Read())
+                    {                        
+                        user.Name = reader["Name"].ToString();
+                        user.Password = _aes.DecryptString(reader["Password"].ToString());
+                    }
+                }
+            }
+            return user;
         }
 
         public void InsertUser(User user)

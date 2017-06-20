@@ -39,30 +39,32 @@ namespace Spikemoss.ViewModels
 
         override protected void SaveWork(object sender, DoWorkEventArgs e)
         {
-            this.SaveWorker.ReportProgress(0, "Starting");
-            Properties.Settings.Default.ConnectionString = this.ConnectionString;
-            Properties.Settings.Default.DataAccessLayerType = (int)DataAccessLayerType.MSSQL;
+            DataAccessLayerFactory factory = new DataAccessLayerFactory();
+            var dal = factory.CreateDataAccessLayer(DataAccessLayerType.MSSQL, this.ConnectionString);
 
+            this.SaveWorker.ReportProgress(0, "Starting");
             try
             {
-                DataAccessLayer.ConnectionString = this.ConnectionString;
-                DataAccessLayer.CreateDatabase();
+                dal.CreateDatabase();
+                dal.CreateTables();
                 Properties.Settings.Default.ConnectionString = DataAccessLayer.ConnectionString;
+                Properties.Settings.Default.DataAccessLayerType = (int)DataAccessLayerType.MSSQL;
+                Properties.Settings.Default.Save();
                 ProgressMessage = "Done";
                 ProgressValue = 100;
             }
             catch (Exception ex)
             {
-                this.SaveWorker.ReportProgress(100, ex.Message);
-                if (ex.Message.Contains("already exists"))
-                {
-                    SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
-                    builder.ConnectionString = this.ConnectionString;
-                    builder.InitialCatalog = Properties.Settings.Default.DatabaseName;
-
-                    Properties.Settings.Default.DataAccessLayerType = (int)DataAccessLayerType.MSSQL;
-                    Properties.Settings.Default.ConnectionString = builder.ConnectionString;
-                }
+                ErrorMessage = ex.Message;
+            }
+            finally
+            {
+                var builder = new SqlConnectionStringBuilder();
+                builder.ConnectionString = this.ConnectionString;
+                builder.InitialCatalog = Properties.Settings.Default.DatabaseName;
+                Properties.Settings.Default.ConnectionString = builder.ConnectionString;
+                Properties.Settings.Default.DataAccessLayerType = (int)DataAccessLayerType.MSSQL;
+                Properties.Settings.Default.Save();
             }
         }
 

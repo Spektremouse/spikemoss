@@ -35,14 +35,14 @@
         </Menu>
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="13*"/>
+                <RowDefinition Height="8*"/>
                 <RowDefinition Height="74*"/>
-                <RowDefinition Height="13*"/>
+                <RowDefinition Height="8*"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="8*"/>
+                <ColumnDefinition Width="6*"/>
                 <ColumnDefinition Width="72*"/>
-                <ColumnDefinition Width="8*"/>
+                <ColumnDefinition Width="6*"/>
             </Grid.ColumnDefinitions>
             <Grid Grid.Column="1" Grid.Row="1">
                 <Grid.ColumnDefinitions>
@@ -50,9 +50,9 @@
                     <ColumnDefinition Width="72*"/>
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="8*"/>
+                    <RowDefinition Height="1*"/>
                     <RowDefinition Height="74*"/>
-                    <RowDefinition Height="18*"/>
+                    <RowDefinition Height="10*"/>
                 </Grid.RowDefinitions>
                 <TreeView Grid.Column="0" Grid.Row="1" BorderThickness="1" Margin="4,0,4,0" ItemsSource="{Binding ClusterList}" SelectedItemChanged="TreeView_SelectedItemChanged">
                     <TreeView.Resources>
@@ -68,7 +68,7 @@
                         </DataTemplate>
                     </TreeView.Resources>
                 </TreeView>
-                <ContentControl Grid.Column="1" Grid.Row="1" Content="{Binding SelectedItem}" />
+                <ContentControl Margin="30,0,0,0" Grid.Column="1" Grid.Row="1" Content="{Binding SelectedItem}" />
                 <DockPanel Grid.Column="0" Grid.Row="2">
                     <Button DockPanel.Dock="Left" Margin="5" Width="55" Height="30">Btn1</Button>
                     <Button Margin="5" Width="55" Height="30">Btn2</Button>

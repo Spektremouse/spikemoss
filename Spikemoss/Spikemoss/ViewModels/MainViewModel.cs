@@ -134,7 +134,15 @@ namespace Spikemoss.ViewModels
             var manager = new ConfigurationIO();
 
             ProgressMessage = "Exporting configuration file.";
-            manager.ExportConfiguration(Filepath, DataAccessLayer.GetAllServers());
+
+            var serverList = DataAccessLayer.GetAllServers();
+
+            foreach (var server in serverList)
+            {
+                server.User = DataAccessLayer.GetUser(server.User.UserID);
+            }
+
+            manager.ExportConfiguration(Filepath, serverList);
         }
 
         private void ImportConfiguration(object sender, DoWorkEventArgs e)
@@ -148,14 +156,7 @@ namespace Spikemoss.ViewModels
             {                
                 ProgressMessage = String.Format("{0}/{1} servers imported.", i, manager.ServerList.Count);
                 DataAccessLayer.InsertServer(server);
-                i++;
-            }
-
-            i = 0;
-            foreach (var user in manager.UserList)
-            {
-                ProgressMessage = String.Format("{0}/{1} servers imported.", i, manager.UserList.Count);
-                DataAccessLayer.InsertUser(user);
+                DataAccessLayer.InsertUser(server.User);
                 i++;
             }
         }
@@ -168,6 +169,9 @@ namespace Spikemoss.ViewModels
                 ErrorOccurred(this, new EventArgs());
             }
             ProgressFinish(this, new EventArgs());
+            _clusterViewModelList.Clear();
+            _clusterList.Clear();
+            _loadWorker.RunWorkerAsync();
         }
 
         private void LoadDataWork(object sender, DoWorkEventArgs e)

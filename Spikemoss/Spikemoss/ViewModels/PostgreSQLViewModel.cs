@@ -25,29 +25,32 @@ namespace Spikemoss.ViewModels
 
         override protected void SaveWork(object sender, DoWorkEventArgs e)
         {
-            this.SaveWorker.ReportProgress(0, "Starting");
-            Properties.Settings.Default.ConnectionString = this.ConnectionString;
-            Properties.Settings.Default.DataAccessLayerType = (int)DataAccessLayerType.PostgreSQL;
+            DataAccessLayerFactory factory = new DataAccessLayerFactory();
+            var dal = factory.CreateDataAccessLayer(DataAccessLayerType.PostgreSQL, this.ConnectionString);
 
+            this.SaveWorker.ReportProgress(0, "Starting");
             try
             {
-                DataAccessLayer.ConnectionString = this.ConnectionString;
-                DataAccessLayer.CreateDatabase();
+                dal.CreateDatabase();
+                dal.CreateTables();
                 Properties.Settings.Default.ConnectionString = DataAccessLayer.ConnectionString;
+                Properties.Settings.Default.DataAccessLayerType = (int)DataAccessLayerType.PostgreSQL;
+                Properties.Settings.Default.Save();
                 ProgressMessage = "Done";
                 ProgressValue = 100;
             }
             catch (Exception ex)
             {
-                this.SaveWorker.ReportProgress(100, ex.Message);
-                if (ex.Message.Contains("already exists"))
-                {
-                    var builder = new NpgsqlConnectionStringBuilder();
-                    builder.ConnectionString = this.ConnectionString;
-                    builder.Database = Properties.Settings.Default.DatabaseName;
-                    Properties.Settings.Default.DataAccessLayerType = (int)DataAccessLayerType.PostgreSQL;
-                    Properties.Settings.Default.ConnectionString = builder.ConnectionString;
-                }
+                ErrorMessage = ex.Message;
+            }
+            finally
+            {
+                var builder = new NpgsqlConnectionStringBuilder();
+                builder.ConnectionString = this.ConnectionString;
+                builder.Database = Properties.Settings.Default.DatabaseName;
+                Properties.Settings.Default.ConnectionString = builder.ConnectionString;
+                Properties.Settings.Default.DataAccessLayerType = (int)DataAccessLayerType.PostgreSQL;
+                Properties.Settings.Default.Save();
             }
         }
 

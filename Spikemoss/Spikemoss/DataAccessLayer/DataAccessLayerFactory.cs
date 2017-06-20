@@ -21,9 +21,12 @@ namespace Spikemoss.DataAccessLayer
                     idal = MSSQL.Instance;
                     break;
                 default:
-                    throw new ArgumentException("Database not supported.");
+                    break;
             }
-            idal.ConnectionString = connectionString;
+            if (idal != null)
+            {
+                idal.ConnectionString = connectionString;
+            }            
             return idal;
         }
     }
