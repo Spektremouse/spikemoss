@@ -3,7 +3,7 @@ using Spikemoss.Properties;
 
 namespace Spikemoss.ViewModels
 {
-    class DataViewModel : BaseViewModel
+    public class DataViewModel : BaseViewModel
     {
         private DataAccessLayerFactory factory = new DataAccessLayerFactory();
 

@@ -13,6 +13,9 @@ namespace Spikemoss
         [STAThread]
         public static void Main(string[] args)
         {
+            DataAccessLayerFactory idalfactory = new DataAccessLayerFactory();
+            idalfactory.CreateDataAccessLayer((DataAccessLayerType)Properties.Settings.Default.DataAccessLayerType, Properties.Settings.Default.ConnectionString);
+
             MainViewModel mainViewModel = new MainViewModel();
             MainWindow mainWindow = new MainWindow(mainViewModel);
             var app = new Application();

@@ -1,10 +1,13 @@
-﻿namespace Spikemoss.Models
+﻿using System.Collections.Generic;
+
+namespace Spikemoss.Models
 {
-    class Cluster
+    public class Cluster
     {
         #region Members
         private int _clusterID;
         private string _name;
+        private IEnumerable<Server> _serverList;
         #endregion
 
         #region Accessors and Mutators
@@ -32,6 +35,12 @@
             {
                 _name = value;
             }
+        }
+
+        public IEnumerable<Server> ServerList
+        {
+            get { return _serverList; }
+            set { _serverList = value; }
         }
         #endregion
     }

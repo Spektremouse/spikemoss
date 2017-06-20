@@ -23,7 +23,7 @@ namespace Spikemoss.DataAccessLayer
                 default:
                     throw new ArgumentException("Database not supported.");
             }
-
+            idal.ConnectionString = connectionString;
             return idal;
         }
     }

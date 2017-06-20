@@ -21,12 +21,23 @@ namespace Spikemoss.Views
     /// </summary>
     public partial class MainWindow : Window
     {
-        public MainWindow(MainViewModel _viewmodel)
+        private MainViewModel _viewModel;
+        public event EventHandler ViewReady;
+
+        public MainWindow(MainViewModel viewmodel)
         {
             InitializeComponent();
+            _viewModel = viewmodel;
+            this.DataContext = _viewModel;
+            _viewModel.RequestShow += OnRequestShow;
+            _viewModel.ErrorOccurred += OnErrorOccurred;
+            this.ViewReady += _viewModel.OnViewReady;
+        }
 
-            this.DataContext = _viewmodel;
-            _viewmodel.RequestShow += OnRequestShow;
+        private void OnErrorOccurred(object sender, EventArgs e)
+        {
+            ErrorWindow win = new ErrorWindow(_viewModel);
+            win.ShowDialog();
         }
 
         private void OnRequestShow(object sender, EventArgs e)
@@ -42,6 +53,15 @@ namespace Spikemoss.Views
                 ConfigurationWindow configuration = new ConfigurationWindow();
                 configuration.ShowDialog();
             }
+            else
+            {
+                ViewReady(this, new EventArgs());
+            }
+        }
+
+        private void TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            _viewModel.SelectedItem = e.NewValue;
         }
     }
 }

@@ -1,5 +1,7 @@
 ﻿using Npgsql;
 using System;
+using Spikemoss.Models;
+using System.Collections.Generic;
 
 namespace Spikemoss.DataAccessLayer
 {
@@ -67,6 +69,83 @@ namespace Spikemoss.DataAccessLayer
         }
 
         public void CreateTables()
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<Server> GetAllServers()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void DeleteServer(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Server GetServer(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void InsertServer(Server server)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void UpdateServer(Server server)
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<Cluster> GetAllClusters()
+        {
+            throw new NotImplementedException();
+        }        
+
+        public void DeleteCluster(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Cluster GetCluster(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<Server> GetClusterServers(Cluster cluster) { throw new NotImplementedException(); }
+
+        public void InsertCluster(Cluster Cluster)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void UpdateCluster(Cluster Cluster)
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<User> GetAllUsers()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void DeleteUser(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public User GetUser(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void InsertUser(User user)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void UpdateUser(User user)
         {
             throw new NotImplementedException();
         }

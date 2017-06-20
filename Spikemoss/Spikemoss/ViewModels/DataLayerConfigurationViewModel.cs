@@ -139,7 +139,6 @@ namespace Spikemoss.ViewModels
                 ErrorOccurred(sender, e);
                 StatusText = null;
             }
-            Properties.Settings.Default.Save();
             StatusText = "Save Complete.";
             Mouse.OverrideCursor = null;
             ProgressFinish(this, new EventArgs());

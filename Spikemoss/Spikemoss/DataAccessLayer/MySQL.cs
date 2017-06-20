@@ -1,5 +1,8 @@
 ﻿using System;
 using MySql.Data.MySqlClient;
+using Spikemoss.Models;
+using System.Data;
+using System.Collections.Generic;
 
 namespace Spikemoss.DataAccessLayer
 {
@@ -77,6 +80,157 @@ namespace Spikemoss.DataAccessLayer
                 CreateHardwareTable(con);
                 con.Close();
             }
+        }
+
+        public List<Server> GetAllServers()
+        {
+            var list = new List<Server>();
+            using (var con = new MySqlConnection(ConnectionString))
+            {
+                con.Open();
+                var cmd = new MySqlCommand("SELECT * FROM server;", con);
+                using (MySqlDataReader data = cmd.ExecuteReader())
+                {
+                    while (data.Read())
+                    {
+                        list.Add(ReadServer(data));
+                    }
+                }
+                con.Close();
+            }
+            return list;
+        }
+
+        public void DeleteServer(int id)
+        {
+        }
+
+        public Server GetServer(int id)
+        {
+            return null;
+        }
+
+        public void InsertServer(Server server) { }
+
+        public void UpdateServer(Server server)
+        {
+        }
+
+        public List<Cluster> GetAllClusters()
+        {
+            var list = new List<Cluster>();
+            using (var con = new MySqlConnection(ConnectionString))
+            {
+                con.Open();
+                var cmd = new MySqlCommand("SELECT * FROM cluster;", con);
+                using (MySqlDataReader data = cmd.ExecuteReader())
+                {
+                    if (data.HasRows)
+                    {
+                        while (data.Read())
+                        {
+                            var cluster = new Cluster();
+                            cluster.ClusterID = data.GetInt32("ClusterID");
+                            cluster.Name = data.GetString("Name");
+                            list.Add(cluster);
+                        }
+                    }                    
+                }
+                con.Close();
+            }
+            return list;
+        }
+
+        public void DeleteCluster(int id)
+        {
+        }
+
+        public Cluster GetCluster(int id)
+        {
+            return null;
+        }
+
+        public List<Server> GetClusterServers(Cluster cluster)
+        {
+            var list = new List<Server>();
+            using (var con = new MySqlConnection(ConnectionString))
+            {
+                con.Open();
+                if (cluster.ClusterID > 0)
+                {
+                    var cmd = new MySqlCommand("SELECT * FROM server WHERE ClusterID=@clusterID;", con);
+                    using (MySqlDataReader data = cmd.ExecuteReader())
+                    {
+                        if (data.HasRows)
+                        {
+                            while (data.Read())
+                            {
+                                list.Add(ReadServer(data));
+                            }
+                        }
+                    }
+                }
+                else if (cluster.ClusterID == 0)
+                {
+                    var cmd = new MySqlCommand("SELECT * FROM server WHERE ClusterID IS NULL;", con);
+                    using (MySqlDataReader data = cmd.ExecuteReader())
+                    {
+                        if (data.HasRows)
+                        {
+                            while (data.Read())
+                            {                                
+                                list.Add(ReadServer(data));
+                            }
+                        }
+                    }
+                }                
+                con.Close();
+            }
+            return list;
+        }
+
+        public void InsertCluster(Cluster cluster) { }
+
+        public void UpdateCluster(Cluster cluster)
+        {
+        }
+
+        public List<User> GetAllUsers()
+        {
+            var list = new List<User>();
+            using (var con = new MySqlConnection(ConnectionString))
+            {
+                con.Open();
+                var cmd = new MySqlCommand("SELECT * FROM user;", con);
+                using (MySqlDataReader data = cmd.ExecuteReader())
+                {
+                    while (data.Read())
+                    {
+                        var user = new User();
+                        user.UserID = data.GetInt32("UserID");
+                        user.Name = data.GetString("Name");
+                        user.Password = data.GetString("Password");
+                        list.Add(user);
+                    }
+                }
+                con.Close();
+            }
+            return list;
+        }
+        
+        public void DeleteUser(int id)
+        {
+        }
+
+        public User GetUser(int id)
+        {
+            return null;
+        }
+
+        public void InsertUser(User user) { }
+
+        public void UpdateUser(User user)
+        {
         }
 
         private void CreateUserTable(MySqlConnection connection)
@@ -157,6 +311,44 @@ namespace Spikemoss.DataAccessLayer
                  + " CONSTRAINT ServerHardwareFK FOREIGN KEY(ServerID)"
                  + " REFERENCES server (ServerID) ON DELETE CASCADE ON UPDATE NO ACTION);", connection);
             cmd.ExecuteNonQuery();
+        }
+
+        private Server ReadServer(MySqlDataReader data)
+        {
+            var server = new Server();
+            server.ServerID = data.GetInt32("ServerID");
+            if (!data.IsDBNull(data.GetOrdinal("ClusterID")))
+            {
+                server.ClusterID = data.GetInt32("ClusterID");                
+            }
+            if (!data.IsDBNull(data.GetOrdinal("UserID")))
+            {
+                server.User.UserID = data.GetInt32("UserID");
+            }
+            if (!data.IsDBNull(data.GetOrdinal("VirtualHostID")))
+            {
+                server.VirtualHostID = data.GetInt32("VirtualHostID");
+            }
+            if (!data.IsDBNull(data.GetOrdinal("Address")))
+            {
+                server.Address = data.GetString("Address");
+            }
+            if (!data.IsDBNull(data.GetOrdinal("Hostname")))
+            {
+                server.Hostname = data.GetString("Hostname");
+            }
+            server.SSHPort = data.GetInt32("SSHPort");
+            if (!data.IsDBNull(data.GetOrdinal("Error")))
+            {
+                server.Hostname = data.GetString("Error");
+            }
+            server.OperatingSystem = (OperatingSystemType)Enum.Parse(typeof(OperatingSystemType),
+                data.GetString("OperatingSystemType"));
+            server.ServerType = (ServerType)Enum.Parse(typeof(ServerType),
+                data.GetString("ServerType"));
+            server.IsConfigured = data.GetBoolean("IsConfigured");
+            server.IsVirtual = data.GetBoolean("IsVirtual");
+            return server;
         }
     }
 }

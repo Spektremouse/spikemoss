@@ -2,6 +2,7 @@
 {
     public enum OperatingSystemType
     {
+        Unknown,
         Windows,
         Linux,
         AIX,

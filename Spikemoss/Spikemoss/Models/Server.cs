@@ -6,6 +6,7 @@ namespace Spikemoss.Models
     {
         #region Members
         private bool _isConfigured;
+        private bool _isVirtual;
         private int _clusterID;
         private int _serverID;
         private int _sshPort;
@@ -19,11 +20,23 @@ namespace Spikemoss.Models
         private User _user;
         #endregion
 
+        public Server()
+        {
+            _user = new User();
+            _hardware = new Hardware();
+        }
+
         #region Accessors and Mutators
         public bool IsConfigured
         {
             get { return _isConfigured; }
             set { _isConfigured = value; }
+        }
+
+        public bool IsVirtual
+        {
+            get { return _isVirtual; }
+            set { _isVirtual = value; }
         }
 
         public int ClusterID
