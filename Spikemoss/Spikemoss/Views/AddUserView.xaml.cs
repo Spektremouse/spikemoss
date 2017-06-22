@@ -12,19 +12,15 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using Spikemoss.ViewModels;
-
 
 namespace Spikemoss.Views
 {
     /// <summary>
-    /// Interaction logic for ServerView.xaml
+    /// Interaction logic for AddUserView.xaml
     /// </summary>
-    public partial class ServerView : UserControl
+    public partial class AddUserView : UserControl
     {
-        private ServerViewModel _viewModel;
-
-        public ServerView()
+        public AddUserView()
         {
             InitializeComponent();
         }

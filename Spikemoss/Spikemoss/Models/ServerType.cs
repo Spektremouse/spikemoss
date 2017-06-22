@@ -8,8 +8,8 @@ namespace Spikemoss.Models
 {
     public enum ServerType
     {
-        Physical,
-        Virtual,
-        Unknown
+        Physical = 1,
+        Virtual = 2,
+        Unknown = 3
     }
 }

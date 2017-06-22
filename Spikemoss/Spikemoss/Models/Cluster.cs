@@ -5,8 +5,8 @@ namespace Spikemoss.Models
     public class Cluster
     {
         #region Members
-        private int _clusterID;
-        private string _name;
+        private int _clusterID = 0;
+        private string _name = "";
         private IEnumerable<Server> _serverList;
         #endregion
 

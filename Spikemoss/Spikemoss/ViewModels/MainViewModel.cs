@@ -52,7 +52,23 @@ namespace Spikemoss.ViewModels
         public object SelectedItem
         {
             get { return _selectedItem; }
-            set { _selectedItem = value; OnPropertyChanged("SelectedItem"); Console.WriteLine(_selectedItem.GetType()); }
+            set
+            {
+                _selectedItem = value;
+                OnPropertyChanged("SelectedItem");
+                if (_selectedItem != null)
+                {
+                    if (_selectedItem.GetType() == typeof(ClusterViewModel))
+                    {
+                        _selectedItem = new ClusterViewModel(((ClusterViewModel)_selectedItem).Cluster);
+                    }
+                    else if (_selectedItem.GetType() == typeof(ServerViewModel))
+                    {
+
+                        _selectedItem = new ServerViewModel(((ServerViewModel)_selectedItem).Server);
+                    }
+                }                
+            }
         }
 
         public string ErrorMessage
@@ -115,6 +131,36 @@ namespace Spikemoss.ViewModels
             if (message is DataLayerConfigurationViewModel)
             {
                 RequestShow(this, new EventArgs());
+            }
+            if (message.GetType() == typeof(ClusterViewModel))
+            {
+                var tempCluster = message as ClusterViewModel;
+                if (ClusterList.Contains(tempCluster))
+                {
+
+                }
+                else if (!ClusterList.Contains(tempCluster))
+                {
+                    foreach (var server in tempCluster.ServerList)
+                    {
+                        foreach (var cluster in ClusterList)
+                        {
+                            var tempList = new List<ServerViewModel>();
+                            foreach (var serverDuplicate in cluster.ServerList)
+                            {
+                                if (server.Server.ServerID == serverDuplicate.Server.ServerID)
+                                {
+                                    tempList.Add(serverDuplicate);
+                                }
+                            }
+                            foreach (var tempDuplicate in tempList)
+                            {
+                                cluster.ServerList.Remove(tempDuplicate);
+                            }
+                        }
+                    }
+                    ClusterList.Add((ClusterViewModel)message);
+                }
             }
         }
 
@@ -208,13 +254,11 @@ namespace Spikemoss.ViewModels
                 foreach (var server in clusterServers)
                 {
                     //Create the ViewModel that will manage each server instance
-                    var serverViewModel = new ServerViewModel();
-                    serverViewModel.Server = server;
+                    var serverViewModel = new ServerViewModel(server);
                     //Add the view model to the current clusters ServerViewModel list
                     serverViewModels.Add(serverViewModel);
                 }
-                var clusterVm = new ClusterViewModel();
-                clusterVm.CurrentCluster = cluster;
+                var clusterVm = new ClusterViewModel(cluster);
                 clusterVm.ServerListToLoad = serverViewModels;
                 _clusterList.Add(clusterVm);
             }

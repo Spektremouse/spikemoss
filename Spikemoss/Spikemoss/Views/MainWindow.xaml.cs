@@ -62,7 +62,12 @@ namespace Spikemoss.Views
 
         private void TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            _viewModel.SelectedItem = e.NewValue as BaseViewModel;
+            //_viewModel.SelectedItem = e.NewValue as BaseViewModel;
+            if (_viewModel != null)
+            {
+                var treeItem = sender as TreeView;
+                _viewModel.SelectedItem = treeItem.SelectedItem;
+            }
         }
 
         private void ExitClick(object sender, RoutedEventArgs e)
@@ -101,6 +106,12 @@ namespace Spikemoss.Views
                 ProgressWindow win = new ProgressWindow(_viewModel, _viewModel.ExportConfigurationCommand);
                 win.ShowDialog();
             }
+        }
+
+        private void AddClusterClick(object sender, RoutedEventArgs e)
+        {
+            var addwindow = new AddEntityWindow(new AddEntityViewModel(_viewModel));
+            addwindow.ShowDialog();
         }
     }
 }

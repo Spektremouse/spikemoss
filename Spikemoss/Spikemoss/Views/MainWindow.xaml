@@ -69,11 +69,14 @@
                     </TreeView.Resources>
                 </TreeView>
                 <ContentControl Margin="30,0,0,0" Grid.Column="1" Grid.Row="1" Content="{Binding SelectedItem}" />
-                <DockPanel Grid.Column="0" Grid.Row="2">
-                    <Button DockPanel.Dock="Left" Margin="5" Width="55" Height="30">Btn1</Button>
-                    <Button Margin="5" Width="55" Height="30">Btn2</Button>
-                    <Button DockPanel.Dock="Right" Margin="5" Height="30">Btn3</Button>
-                </DockPanel>
+                <Grid Grid.Column="0" Grid.Row="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="50*"/>
+                        <ColumnDefinition Width="50*"/>
+                    </Grid.ColumnDefinitions>
+                    <Button Grid.Column="0" Margin="5" Height="30" Click="AddClusterClick">Add Cluster</Button>
+                    <Button Grid.Column="1" Margin="5" Height="30">Add Server</Button>
+                </Grid>
 
             </Grid>
         </Grid>

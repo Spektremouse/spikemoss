@@ -180,6 +180,59 @@ namespace Spikemoss.DataAccessLayer
 
         public void UpdateServer(Server server)
         {
+            using (var con = new MySqlConnection(ConnectionString))
+            {
+                con.Open();
+                string query = "UPDATE server SET "
+                        + "ClusterID=@ClusterID,"
+                        + "UserID=@UserID,"
+                        + "VirtualHostID=@VirtualHostID,"
+                        + "Address=@Address,"
+                        + "Hostname=@Hostname,"
+                        + "SSHPort=@SSHPort,"
+                        + "Error=@Error,"
+                        + "OperatingSystemType=@OperatingSystemType,"
+                        + "ServerType=@ServerType,"
+                        + "IsConfigured=@IsConfigured,"
+                        + "IsVirtual=@IsVirtual "
+                        + "WHERE ServerID=@ServerID;";
+                var cmd = new MySqlCommand(query, con);
+
+                cmd.Parameters.AddWithValue("@ServerID", server.ServerID);
+                if (server.ClusterID == 0)
+                {
+                    cmd.Parameters.AddWithValue("@ClusterID", null);
+                }
+                else
+                {
+                    cmd.Parameters.AddWithValue("@ClusterID", server.ClusterID);
+                }
+                if (server.User.UserID == 0)
+                {
+                    cmd.Parameters.AddWithValue("@UserID", null);
+                }
+                else
+                {
+                    cmd.Parameters.AddWithValue("@UserID", server.User.UserID);
+                }
+                if (server.VirtualHostID == 0)
+                {
+                    cmd.Parameters.AddWithValue("@VirtualHostID", null);
+                }
+                else
+                {
+                    cmd.Parameters.AddWithValue("@VirtualHostID", server.VirtualHostID);
+                }
+                cmd.Parameters.AddWithValue("@Address", server.Address);
+                cmd.Parameters.AddWithValue("@Hostname", server.Hostname);
+                cmd.Parameters.AddWithValue("@SSHPort", server.SSHPort);
+                cmd.Parameters.AddWithValue("@Error", server.Error);
+                cmd.Parameters.AddWithValue("@OperatingSystemType", server.OperatingSystem.ToString());
+                cmd.Parameters.AddWithValue("@ServerType", server.ServerType.ToString());
+                cmd.Parameters.AddWithValue("@IsConfigured", server.IsConfigured);
+                cmd.Parameters.AddWithValue("@IsVirtual", server.IsVirtual);
+                cmd.ExecuteNonQuery();
+            }
         }
 
         public List<Cluster> GetAllClusters()
@@ -255,7 +308,21 @@ namespace Spikemoss.DataAccessLayer
             return list;
         }
 
-        public void InsertCluster(Cluster cluster) { }
+        public void InsertCluster(Cluster cluster)
+        {
+            using (var con = new MySqlConnection(ConnectionString))
+            {
+                con.Open();
+                string query = "INSERT INTO cluster"
+                        + "(Name)"
+                        + " VALUES (@Name);"
+                        + "SELECT LAST_INSERT_ID();";
+                var cmd = new MySqlCommand(query, con);
+                cmd.Parameters.AddWithValue("@Name", cluster.Name);
+
+                cluster.ClusterID = Convert.ToInt32(cmd.ExecuteScalar());
+            }
+        }
 
         public void UpdateCluster(Cluster cluster)
         {

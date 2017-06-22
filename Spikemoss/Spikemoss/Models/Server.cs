@@ -7,14 +7,14 @@ namespace Spikemoss.Models
         #region Members
         private bool _isConfigured;
         private bool _isVirtual;
-        private int _clusterID;
-        private int _serverID;
-        private int _sshPort;
-        private int _virtualHostID;        
+        private int _clusterID = 0;
+        private int _serverID = 0;
+        private int _sshPort = 22;
+        private int _virtualHostID = 0;        
         private string _error;
         private string _hostname;
-        private OperatingSystemType _operatingSystem;
-        private ServerType _serverType;     
+        private OperatingSystemType _operatingSystem = OperatingSystemType.Unknown;
+        private ServerType _serverType = ServerType.Unknown;     
         private Hardware _hardware;
         private IPAddress _address;
         private User _user;

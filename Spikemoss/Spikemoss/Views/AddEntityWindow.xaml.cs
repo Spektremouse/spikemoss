@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Spikemoss.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,23 +11,22 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
-using Spikemoss.ViewModels;
-
 
 namespace Spikemoss.Views
 {
     /// <summary>
-    /// Interaction logic for ServerView.xaml
+    /// Interaction logic for AddEntityWindow.xaml
     /// </summary>
-    public partial class ServerView : UserControl
+    public partial class AddEntityWindow : Window
     {
-        private ServerViewModel _viewModel;
+        private AddEntityViewModel _viewmodel;
 
-        public ServerView()
+        public AddEntityWindow(AddEntityViewModel viewmodel)
         {
             InitializeComponent();
+            _viewmodel = viewmodel;
+            this.DataContext = _viewmodel;
         }
     }
 }

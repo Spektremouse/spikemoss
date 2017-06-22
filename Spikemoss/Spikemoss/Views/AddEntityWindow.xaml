@@ -1,0 +1,54 @@
+﻿<Window x:Class="Spikemoss.Views.AddEntityWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Spikemoss.Views"
+        xmlns:viewmodel="clr-namespace:Spikemoss.ViewModels"
+        mc:Ignorable="d"
+        Title="AddEntityWindow" Height="450" Width="650" ResizeMode="NoResize">
+
+    <Window.Resources>
+        <DataTemplate DataType="{x:Type viewmodel:ClusterViewModel}">
+            <local:AddClusterView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewmodel:ServerViewModel}">
+            <local:AddServerView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewmodel:UserViewModel}">
+            <local:AddUserView />
+        </DataTemplate>
+    </Window.Resources>
+
+    <Grid x:Name="MainGrid">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="8*"/>
+            <RowDefinition Height="74*"/>
+            <RowDefinition Height="8*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="9*"/>
+            <ColumnDefinition Width="72*"/>
+            <ColumnDefinition Width="9*"/>
+        </Grid.ColumnDefinitions>
+        <Grid Grid.Column="1" Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="8*"/>
+                <RowDefinition Height="80*"/>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="4*"/>
+                </Grid.ColumnDefinitions>
+                <Label Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Top">Select one:</Label>
+                <ComboBox Grid.Column="1" Width="160" Height="24" VerticalAlignment="Top" HorizontalAlignment="Left" SelectedIndex="{Binding CurrentEntityIndex}">
+                    <ComboBoxItem>Cluster</ComboBoxItem>
+                    <ComboBoxItem>Server</ComboBoxItem>
+                    <ComboBoxItem>User</ComboBoxItem>
+                </ComboBox>
+            </Grid>
+            <ContentControl Grid.Row="1" Content="{Binding CurrentEntity}" ></ContentControl>
+        </Grid>
+    </Grid>
+</Window>

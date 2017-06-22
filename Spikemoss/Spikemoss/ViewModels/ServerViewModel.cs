@@ -17,14 +17,15 @@ namespace Spikemoss.ViewModels
         private List<Server> _serverList = new List<Server>();
         ObservableCollection<ServerViewModel> _serverViewModelList;
 
-        public ServerViewModel()
+        public ServerViewModel(Server server)
         {
             ViewModelMediator.Instance.Register(this);
+            _server = server;
         }
 
         public Server Server
         {
-            private get { return _server; }
+            get { return _server; }
             set { _server = value; }
         }
 
@@ -40,16 +41,25 @@ namespace Spikemoss.ViewModels
             set { _server.Address = value; OnPropertyChanged("Address"); }
         }
 
+        public int ServerType
+        {
+            get { return (int)_server.ServerType; }
+            set { _server.ServerType = (ServerType)value; OnPropertyChanged("ServerType"); }
+        }
+
         public void ReceiveMessage(object message)
         {
-            if (message.GetType() == typeof(string))
+            if (message != null)
             {
-                string tempMessage = message as string;
-                if (tempMessage == LOAD_COMPLETE_MESSAGE)
+                if (message.GetType() == typeof(string))
                 {
-                    
+                    string tempMessage = message as string;
+                    if (tempMessage == LOAD_COMPLETE_MESSAGE)
+                    {
+
+                    }
                 }
-            }
+            }            
         }
 
         public void SendMessage(IMediator mediator, object message)
