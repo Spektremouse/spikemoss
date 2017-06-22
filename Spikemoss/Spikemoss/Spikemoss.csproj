@@ -73,7 +73,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Models\IDomainEntity.cs" />
-    <Compile Include="ViewModels\AddEntityViewModel.cs" />
     <Compile Include="ViewModels\ClusterViewModel.cs" />
     <Compile Include="ViewModels\Communication\IMediator.cs" />
     <Compile Include="ViewModels\Communication\ViewModelMediator.cs" />
@@ -88,13 +87,11 @@
     <Compile Include="ViewModels\MySQLViewModel.cs" />
     <Compile Include="ViewModels\OracleSQLViewModel.cs" />
     <Compile Include="ViewModels\PostgreSQLViewModel.cs" />
+    <Compile Include="ViewModels\RepositoryHelper.cs" />
     <Compile Include="ViewModels\ServerViewModel.cs" />
     <Compile Include="ViewModels\UserViewModel.cs" />
-    <Compile Include="Views\AddClusterView.xaml.cs">
-      <DependentUpon>AddClusterView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\AddEntityWindow.xaml.cs">
-      <DependentUpon>AddEntityWindow.xaml</DependentUpon>
+    <Compile Include="Views\AddClusterWindow.xaml.cs">
+      <DependentUpon>AddClusterWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\AddServerView.xaml.cs">
       <DependentUpon>AddServerView.xaml</DependentUpon>
@@ -130,11 +127,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </None>
-    <Page Include="Views\AddClusterView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\AddEntityWindow.xaml">
+    <Page Include="Views\AddClusterWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

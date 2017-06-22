@@ -110,7 +110,7 @@ namespace Spikemoss.Views
 
         private void AddClusterClick(object sender, RoutedEventArgs e)
         {
-            var addwindow = new AddEntityWindow(new AddEntityViewModel(_viewModel));
+            var addwindow = new AddClusterWindow();
             addwindow.ShowDialog();
         }
     }

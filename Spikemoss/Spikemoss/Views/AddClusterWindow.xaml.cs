@@ -11,20 +11,18 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace Spikemoss.Views
 {
     /// <summary>
-    /// Interaction logic for AddClusterView.xaml
+    /// Interaction logic for AddClusterWindow.xaml
     /// </summary>
-    public partial class AddClusterView : UserControl
+    public partial class AddClusterWindow : Window
     {
         private ClusterViewModel _viewModel;
-        private Window _parentWindow;
 
-        public AddClusterView()
+        public AddClusterWindow()
         {
             InitializeComponent();
             _viewModel = this.DataContext as ClusterViewModel;
@@ -34,26 +32,24 @@ namespace Spikemoss.Views
 
         private void OnSaveFinished(object sender, EventArgs e)
         {
-            _parentWindow = Window.GetWindow(this);
-            if (_parentWindow.DataContext.GetType() != typeof(MainViewModel))
-            {
-                _parentWindow.Close();
-            }            
+            this.Close();
         }
 
         private void OnErrorOccurred(object sender, EventArgs e)
         {
-            var errorWindow = new ErrorWindow(_viewModel);
-            errorWindow.ShowDialog();
+            var errWin = new ErrorWindow(_viewModel);
+            errWin.ShowDialog();
         }
 
         private void CancelClick(object sender, RoutedEventArgs e)
         {
-            _parentWindow = Window.GetWindow(this);
-            if (_parentWindow.DataContext.GetType() != typeof(MainViewModel))
-            {
-                _parentWindow.Close();
-            }
+            this.Close();
+        }
+
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            _viewModel.ErrorOccurred -= OnErrorOccurred;
+            _viewModel.SaveFinished -= OnSaveFinished;
         }
     }
 }

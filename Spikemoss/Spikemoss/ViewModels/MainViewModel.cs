@@ -16,8 +16,6 @@ namespace Spikemoss.ViewModels
         private const string LOAD_COMPLETE_MESSAGE = "LoadComplete";
         private const string UNCLUSTERED_NAME = "Unclusterd";
 
-        public ClusterViewModel SelectedCluster { get; private set; }
-
         private string _errorMessage;
         private string _progressMessage;
         private int _progressValue;
@@ -26,7 +24,6 @@ namespace Spikemoss.ViewModels
         private BackgroundWorker _loadWorker;
         private BackgroundWorker _configurationIOWorker;
         private ObservableCollection<ClusterViewModel> _clusterViewModelList;
-        private IList<ClusterViewModel> _clusterList = new List<ClusterViewModel>();
 
         public event EventHandler RequestShow;
         public event ErrorHandler ErrorOccurred;
@@ -63,13 +60,13 @@ namespace Spikemoss.ViewModels
                 {
                     if (_selectedItem.GetType() == typeof(ClusterViewModel))
                     {
-                        _selectedItem = new ClusterViewModel(((ClusterViewModel)_selectedItem).Cluster);
+                        _selectedItem = ((ClusterViewModel)_selectedItem);
                         //SelectedCluster = new ClusterViewModel(((ClusterViewModel)_selectedItem).Cluster);
                         //_selectedItem = SelectedCluster;
                     }
                     else if (_selectedItem.GetType() == typeof(ServerViewModel))
                     {
-                        _selectedItem = new ServerViewModel(((ServerViewModel)_selectedItem).Server);
+                        _selectedItem = ((ServerViewModel)_selectedItem);
                     }
                 }                
             }
@@ -136,74 +133,6 @@ namespace Spikemoss.ViewModels
             {
                 RequestShow(this, new EventArgs());
             }
-            if (message.GetType() == typeof(ClusterViewModel))
-            {
-                var clusterVmArgs = message as ClusterViewModel;
-                if (ClusterList.Contains(clusterVmArgs))
-                {
-                    //Handles cluster deletion
-                    if (clusterVmArgs.ID == 0 && clusterVmArgs.Name != UNCLUSTERED_NAME)
-                    {
-                        foreach (var serverVm in clusterVmArgs.ServerList)
-                        {
-                            var unclustered = ClusterList.Single(clusterVm => clusterVm.ID == 0 && clusterVm.Name == UNCLUSTERED_NAME);
-                            unclustered.ServerList.Add(serverVm);                           
-                        }
-                        ClusterList.Remove(clusterVmArgs);
-                        SelectedItem = null;
-                    }
-
-                    //Removes servers from the given cluster
-                    foreach (var serverVm in clusterVmArgs.ServerList)
-                    {
-                        foreach (var clusterVm in ClusterList)
-                        {
-                            if (clusterVm.ID != clusterVmArgs.ID)
-                            {
-                                var tempList = new List<ServerViewModel>();
-                                foreach (var serverDuplicate in clusterVm.ServerList)
-                                {
-                                    if (serverVm.Server.ServerID == serverDuplicate.Server.ServerID)
-                                    {
-                                        tempList.Add(serverDuplicate);
-                                    }
-                                }
-                                foreach (var tempDuplicate in tempList)
-                                {
-                                    clusterVm.ServerList.Remove(tempDuplicate);
-                                }
-                            }
-                        }
-                    }                                   
-                }
-                //Handles Adding new Cluster
-                else if (!ClusterList.Contains(clusterVmArgs))
-                {
-                    //Removes servers from existing clusters and adds them to the new cluster
-                    foreach (var serverVm in clusterVmArgs.ServerList)
-                    {
-                        foreach (var clusterVm in ClusterList)
-                        {
-                            var tempList = clusterVm.ServerList.Where(serverDuplicate => serverVm.Server.ServerID == serverDuplicate.Server.ServerID);
-
-                            /*foreach (var serverDuplicate in cluster.ServerList)
-                            {
-                                if (server.Server.ServerID == serverDuplicate.Server.ServerID)
-                                {
-                                    tempList.Add(serverDuplicate);
-                                }
-                            }*/
-                            foreach (var tempDuplicate in tempList)
-                            {
-                                clusterVm.ServerList.Remove(tempDuplicate);
-                            }
-                        }
-                    }
-                    ClusterList.Add(clusterVmArgs);
-                }
-
-                
-            }
         }
 
         public void SendMessage(IMediator mediator, object message)
@@ -213,7 +142,7 @@ namespace Spikemoss.ViewModels
 
         public void OnViewReady(object sender, EventArgs e)
         {
-            //Listens for an event that signals the ViewModel can begin processing.
+            //Listens for an event that signals the MainViewModel can begin processing.
             _loadWorker.RunWorkerAsync();
         }
 
@@ -257,13 +186,14 @@ namespace Spikemoss.ViewModels
                 ErrorOccurred(this, new EventArgs());
             }
             ProgressFinish(this, new EventArgs());
-            _clusterViewModelList.Clear();
-            _clusterList.Clear();
             _loadWorker.RunWorkerAsync();
         }
 
         private void LoadDataWork(object sender, DoWorkEventArgs e)
         {
+            RepositoryHelper.Instance.Load();
+            
+            /*
             //Created a cluster for unsorted servers
             var unclustered = new Cluster();
             unclustered.ClusterID = 0;
@@ -304,6 +234,7 @@ namespace Spikemoss.ViewModels
                 clusterVm.ServerListToLoad = serverViewModels;
                 _clusterList.Add(clusterVm);
             }
+            */
         }
 
         private void LoadDataWorkCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -313,10 +244,11 @@ namespace Spikemoss.ViewModels
                 ErrorMessage = e.Error.Message;
                 ErrorOccurred(this, new EventArgs());
             }
-            foreach (var clustervm in _clusterList)
-            {
-                _clusterViewModelList.Add(clustervm);
-            }
+            ClusterList = RepositoryHelper.Instance.Clusters;
+            //foreach (var clustervm in _clusterList)
+            //{
+            //     _clusterViewModelList.Add(clustervm);
+            //}
             //Lets everyone know the app is done loading data from the database
             SendMessage(ViewModelMediator.Instance, LOAD_COMPLETE_MESSAGE);
         }        

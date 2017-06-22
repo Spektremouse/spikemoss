@@ -7,7 +7,6 @@ namespace Spikemoss.Models
         #region Members
         private int _clusterID = 0;
         private string _name = "";
-        private IEnumerable<Server> _serverList;
         #endregion
 
         #region Accessors and Mutators
@@ -36,12 +35,6 @@ namespace Spikemoss.Models
                 _name = value;
             }
         }
-
-        /*public IEnumerable<Server> ServerList
-        {
-            get { return _serverList; }
-            set { _serverList = value; }
-        }*/
         #endregion
     }
 }

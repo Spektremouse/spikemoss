@@ -11,14 +11,13 @@ using System.Windows.Input;
 
 namespace Spikemoss.ViewModels
 {
-    public class ClusterViewModel : DataViewModel, IParticipant, IReportErrors
+    public class ClusterViewModel : BaseViewModel, IParticipant, IReportErrors
     {
         private const string LOAD_COMPLETE_MESSAGE = "LoadComplete";
+        private const string UNCLUSTERED_NAME = "Unclusterd";
 
-        private IList<ServerViewModel> _serverListToLoad;
         private Cluster _cluster;
-        private ObservableCollection<ServerViewModel> _serverViewModelList;
-        private ObservableCollection<ServerViewModel> _listToFilter;
+        private ObservableCollection<ServerViewModel> _serverList;
         private ObservableCollection<ServerViewModel> _filteredList;
 
         private ServerViewModel _selectedServer;
@@ -36,85 +35,65 @@ namespace Spikemoss.ViewModels
         public ClusterViewModel()
         {
             ViewModelMediator.Instance.Register(this);
-            _serverViewModelList = new ObservableCollection<ServerViewModel>();
+            _serverList = new ObservableCollection<ServerViewModel>();
             _cluster = new Cluster();
         }
 
         public ClusterViewModel(Cluster cluster)
         {
             ViewModelMediator.Instance.Register(this);
-            _serverViewModelList = new ObservableCollection<ServerViewModel>();
+            _serverList = new ObservableCollection<ServerViewModel>();
             _cluster = cluster;
-            if (_cluster.Name == "Unclustered")
+            if (_cluster.Name == UNCLUSTERED_NAME)
             {
                 HideAttachDetach = false;
             }
         }
 
-        public Cluster Cluster
-        {
-            get { return _cluster; }
-            set { _cluster = value; }
-        }
-
         //The list of servers attached to the cluster
         public ObservableCollection<ServerViewModel> ServerList
         {
-            get { return _serverViewModelList; }
-            set { _serverViewModelList = value; OnPropertyChanged("ClusterList"); }
+            get
+            {
+                if (_cluster.Name == UNCLUSTERED_NAME && _cluster.ClusterID == 0)
+                {
+                    return new ObservableCollection<ServerViewModel>
+                        (
+                        RepositoryHelper.Instance.Servers.Where(server =>
+                        server.ClusterID == _cluster.ClusterID)
+                        );
+                }
+                else if (_cluster.Name != UNCLUSTERED_NAME && _cluster.ClusterID == 0)
+                {
+                    return new ObservableCollection<ServerViewModel>();
+                }
+                else
+                {
+                    return new ObservableCollection<ServerViewModel>
+                        (
+                        RepositoryHelper.Instance.Servers.Where(server =>
+                        server.ClusterID == _cluster.ClusterID && _cluster.Name != UNCLUSTERED_NAME)
+                        );
+                }                
+            }
+            set { _serverList = value; OnPropertyChanged("ServerList"); }
         }
 
+        //The filtered list of servers to be attached
         public ObservableCollection<ServerViewModel> FilteredServers
         {
             get
             {
-                if (_listToFilter == null)
-                {
-                    _listToFilter = new ObservableCollection<ServerViewModel>();
-                    foreach (var server in DataAccessLayer.GetAllServers())
-                    {
-                        if (server.ClusterID != _cluster.ClusterID && _cluster.ClusterID != 0)
-                        {
-                            var serverVm = new ServerViewModel(server);
-                            _listToFilter.Add(serverVm);
-                        }                        
-                    }
-                    _filteredList = _listToFilter;
-                }
-                return _filteredList;
+                return new ObservableCollection<ServerViewModel>
+                        (
+                        RepositoryHelper.Instance.Servers.Where(server =>
+                        server.ClusterID != _cluster.ClusterID && server.ClusterID == 0)
+                        );
             }
             set { _filteredList = value; OnPropertyChanged("FilteredServers"); } 
         }
 
-        public ObservableCollection<ServerViewModel> AddFilteredServers
-        {
-            get
-            {
-                if (_listToFilter == null)
-                {
-                    _listToFilter = new ObservableCollection<ServerViewModel>();
-                    foreach (var server in DataAccessLayer.GetAllServers())
-                    {
-                        if (server.ClusterID == 0)
-                        {
-                            var serverVm = new ServerViewModel(server);
-                            _listToFilter.Add(serverVm);
-                        }                            
-                    }
-                    _filteredList = _listToFilter;
-                }
-                return _filteredList;
-            }
-            set { _filteredList = value; OnPropertyChanged("FilteredServers"); }
-        }
-
-        public IList<ServerViewModel> ServerListToLoad
-        {
-            private get { return _serverListToLoad; }
-            set { _serverListToLoad = value; OnPropertyChanged("ClusterList"); }
-        }
-
-        public int ID
+        public int ClusterID
         {
             get { return _cluster.ClusterID; }
             private set { _cluster.ClusterID = value; }
@@ -180,97 +159,27 @@ namespace Spikemoss.ViewModels
 
         private void Save()
         {
-            if (ValidateSave())
+            try
             {
-                if (_cluster.ClusterID == 0)
+                RepositoryHelper.Instance.Save(this);
+                foreach (var serverVm in _serverList)
                 {
-                    DataAccessLayer.InsertCluster(_cluster);
+                    if (serverVm != null)
+                    {
+                        RepositoryHelper.Instance.Save(serverVm);
+                    }                    
                 }
-                else
-                {
-                    DataAccessLayer.UpdateCluster(_cluster);
-                }
-                foreach (var serverVm in _serverViewModelList)
-                {
-                    serverVm.Server.ClusterID = _cluster.ClusterID;
-                    DataAccessLayer.UpdateServer(serverVm.Server);
-                }
-                SendMessage(ViewModelMediator.Instance, this);
                 var handler = SaveFinished;
 
                 if (handler != null)
                 {
-                    SaveFinished(this, new EventArgs());
-                }
-                
-            }    
-        }
-
-        private bool ValidateSave()
-        {
-            if (String.IsNullOrWhiteSpace(Name))
-            {
-                ErrorMessage = "Name cannot be empty.";
-                var handler = ErrorOccurred;
-
-                if (handler != null)
-                {
                     handler(this, new EventArgs());
                 }
-                if (Cluster.ClusterID != 0)
-                {
-                    GetMemento();
-                }
-                return false;
-            }
-            try
-            {
-                var tempClusterList = DataAccessLayer.GetAllClusters();
-                var filterCount = tempClusterList.Count(tempCluster => _cluster.Name == tempCluster.Name && 
-                                  _cluster.Name != "Unclustered" && _cluster.ClusterID != tempCluster.ClusterID);
-                if (filterCount != 0)
-                {
-                    ErrorMessage = String.Format("A Cluster named {0} already exists. Please enter a unique name.", Cluster.Name);
-                    var handler = ErrorOccurred;
 
-                    if (handler != null)
-                    {
-                        handler(this, new EventArgs());
-                    }
-                    if (Cluster.ClusterID != 0)
-                    {
-                        GetMemento();
-                    }
-                    return false;
-                }
             }
             catch (Exception ex)
             {
-                ErrorMessage = "An error occurred while saving. " + ex.Message;
-                var handler = ErrorOccurred;
-
-                if (handler != null)
-                {
-                    handler(this, new EventArgs());
-                }
-                if (Cluster.ClusterID != 0)
-                {
-                    GetMemento();
-                }
-                return false;
-            }
-            return true;
-        }
-
-        private void GetMemento()
-        {
-            try
-            {
-                Cluster = DataAccessLayer.GetCluster(Cluster.ClusterID);
-            }
-            catch (Exception ex)
-            {
-                ErrorMessage = "An error occurred while restoring data. " + ex.Message;
+                ErrorMessage = ex.Message;
                 var handler = ErrorOccurred;
 
                 if (handler != null)
@@ -287,15 +196,24 @@ namespace Spikemoss.ViewModels
 
         private void Attach()
         {
-            if (!ServerList.Contains(SelectedServer))
+            if (!_serverList.Contains(SelectedServer) && SelectedServer != null)
             {
-                ServerList.Add(SelectedServer);
-            }
-            if (_filteredList.Contains(SelectedServer))
+                SelectedServer.ClusterID = ClusterID;
+            }            
+            Save();
+            ServerList = ServerList;
+            FilteredServers = FilteredServers;
+        }
+
+        private void Detach()
+        {
+            if (_serverList.Contains(SelectedServer))
             {
-                _listToFilter.Remove(SelectedServer);
-                FilteredServers.Remove(SelectedServer);
+                SelectedServer.ClusterID = 0;
+                Save();
             }
+            ServerList = ServerList;
+            FilteredServers = FilteredServers;
         }
 
         public ICommand DetachCommand
@@ -312,14 +230,7 @@ namespace Spikemoss.ViewModels
         {            
             try
             {
-                foreach (var serverVm in _serverViewModelList)
-                {
-                    serverVm.Server.ClusterID = 0;
-                    DataAccessLayer.UpdateServer(serverVm.Server);
-                }
-
-                DataAccessLayer.DeleteCluster(ID);
-                ID = 0;
+                RepositoryHelper.Instance.Delete(this);
                 ViewModelMediator.Instance.Unregister(this);
                 SendMessage(ViewModelMediator.Instance, this);
             }        
@@ -341,38 +252,11 @@ namespace Spikemoss.ViewModels
             {
                 _errorMessage = value;
             }
-        }
-
-        private void Detach()
-        {
-            if (!_filteredList.Contains(SelectedServer))
-            {
-                _listToFilter.Add(SelectedServer);
-                FilteredServers.Add(SelectedServer);
-            }
-            if (ServerList.Contains(SelectedServer))
-            {
-                ServerList.Remove(SelectedServer);
-            }            
-        }
+        }        
 
         public void ReceiveMessage(object message)
         {
-            if (message != null)
-            {
-                if (message.GetType() == typeof(string))
-                {
-                    string tempMessage = message as string;
-                    if (tempMessage == LOAD_COMPLETE_MESSAGE)
-                    {
-                        //null ref err on config import
-                        foreach (var serverVM in _serverListToLoad)
-                        {
-                            _serverViewModelList.Add(serverVM);
-                        }
-                    }
-                }
-            }
+
         }
 
         public void SendMessage(IMediator mediator, object message)
@@ -380,28 +264,31 @@ namespace Spikemoss.ViewModels
             mediator.DistributeMessage(this, message);
         }
 
-        public void FilterChanged()
+        private void FilterChanged()
         {
             if (ShowAll == true)
             {
-                FilteredServers = _listToFilter;
+                FilteredServers = FilteredServers;
             }
             if (ShowPhysical == true)
             {
-                FilteredServers = new ObservableCollection<ServerViewModel>(_listToFilter.Where(server => server.ServerType == (int)ServerType.Physical));
+                FilteredServers = new ObservableCollection<ServerViewModel>(FilteredServers.Where(server =>
+                server.ServerType == (int)ServerType.Physical));
             }
             if (ShowVirtual == true)
             {
-                FilteredServers = new ObservableCollection<ServerViewModel>(_listToFilter.Where(server => server.ServerType == (int)ServerType.Virtual));
+                FilteredServers = new ObservableCollection<ServerViewModel>(FilteredServers.Where(server =>
+                server.ServerType == (int)ServerType.Virtual));
             }
             if (ShowUnknown == true)
             {
-                FilteredServers = new ObservableCollection<ServerViewModel>(_listToFilter.Where(server => server.ServerType == (int)ServerType.Unknown));
+                FilteredServers = new ObservableCollection<ServerViewModel>(FilteredServers.Where(server =>
+                server.ServerType == (int)ServerType.Unknown));
             }
             if (!String.IsNullOrWhiteSpace(SearchText))
             {
-                var tempFilter = FilteredServers.Where(server => server.Address.Contains(SearchText) || server.Hostname.Contains(SearchText));
-                FilteredServers = new ObservableCollection<ServerViewModel>(tempFilter);
+                FilteredServers = new ObservableCollection<ServerViewModel>(FilteredServers.Where(server =>
+                server.Address.Contains(SearchText) || server.Hostname.Contains(SearchText)));
             }
         }
     }

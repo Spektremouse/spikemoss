@@ -23,6 +23,18 @@ namespace Spikemoss.ViewModels
             _server = server;
         }
 
+        public int ServerID
+        {
+            get { return _server.ServerID; }
+            set { _server.ServerID = value; OnPropertyChanged("ServerID"); }
+        }
+
+        public int ClusterID
+        {
+            get { return _server.ClusterID; }
+            set { _server.ClusterID = value; OnPropertyChanged("ClusterID"); }
+        }
+
         public Server Server
         {
             get { return _server; }

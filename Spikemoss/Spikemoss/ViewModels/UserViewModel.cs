@@ -10,10 +10,15 @@ namespace Spikemoss.ViewModels
     class UserViewModel : BaseViewModel
     {
         private User _user;
-
-        public User User
+        
+        public UserViewModel(User user)
         {
-            set { _user = value; }
+            _user = user;
+        }
+
+        public int UserID
+        {
+            get { return _user.UserID; }            
         }
 
         public string Name
