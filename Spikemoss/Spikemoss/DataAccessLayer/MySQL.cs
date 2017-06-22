@@ -207,7 +207,11 @@ namespace Spikemoss.DataAccessLayer
                 {
                     cmd.Parameters.AddWithValue("@ClusterID", server.ClusterID);
                 }
-                if (server.User.UserID == 0)
+                if (server.User == null)
+                {
+                    cmd.Parameters.AddWithValue("@UserID", null);
+                }
+                else if (server.User.UserID == 0)
                 {
                     cmd.Parameters.AddWithValue("@UserID", null);
                 }
@@ -326,6 +330,17 @@ namespace Spikemoss.DataAccessLayer
 
         public void UpdateCluster(Cluster cluster)
         {
+            using (var con = new MySqlConnection(ConnectionString))
+            {
+                con.Open();
+                string query = "UPDATE cluster SET "
+                        + "Name=@Name WHERE ClusterID=@ClusterID;";
+                var cmd = new MySqlCommand(query, con);
+                cmd.Parameters.AddWithValue("@Name", cluster.Name);
+                cmd.Parameters.AddWithValue("@ClusterID", cluster.ClusterID);
+
+                cmd.ExecuteScalar();
+            }
         }
 
         public List<User> GetAllUsers()

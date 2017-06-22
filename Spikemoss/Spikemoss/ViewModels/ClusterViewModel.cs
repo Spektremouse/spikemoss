@@ -137,8 +137,8 @@ namespace Spikemoss.ViewModels
 
         public bool UnsavedChanges
         {
-            get { return _showAll; }
-            set { _showAll = value; OnPropertyChanged("ShowAll"); FilterChanged(); }
+            get { return _changes; }
+            set { _changes = value; OnPropertyChanged("UnsavedChanges"); }
         }
 
         public bool ShowAll
@@ -203,7 +203,7 @@ namespace Spikemoss.ViewModels
                 }
                 else
                 {
-                    DataAccessLayer.UpdateCluster(Cluster);
+                    DataAccessLayer.UpdateCluster(_cluster);
                 }
                 foreach (var serverVm in _serverList)
                 {
@@ -211,7 +211,13 @@ namespace Spikemoss.ViewModels
                     DataAccessLayer.UpdateServer(serverVm.Server);
                 }
                 SendMessage(ViewModelMediator.Instance, this);
-                SaveFinished(this, new EventArgs());
+                var handler = SaveFinished;
+
+                if (handler != null)
+                {
+                    SaveFinished(this, new EventArgs());
+                }
+                
             }    
         }
 
@@ -235,7 +241,8 @@ namespace Spikemoss.ViewModels
             try
             {
                 var tempClusterList = DataAccessLayer.GetAllClusters();
-                var filterCount = tempClusterList.Count(tempCluster => Cluster.Name == tempCluster.Name);
+                var filterCount = tempClusterList.Count(tempCluster => _cluster.Name == tempCluster.Name && 
+                                  _cluster.Name != "Unclustered" && _cluster.ClusterID != tempCluster.ClusterID);
                 if (filterCount != 0)
                 {
                     ErrorMessage = String.Format("A Cluster named {0} already exists. Please enter a unique name.", Cluster.Name);

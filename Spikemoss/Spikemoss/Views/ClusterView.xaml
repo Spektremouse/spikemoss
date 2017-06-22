@@ -70,8 +70,8 @@
                 <ColumnDefinition Width="53*"/>
                 <ColumnDefinition Width="53*"/>
             </Grid.ColumnDefinitions>
-            <!--<Button Grid.Column="1" Margin="5" Click="CancelClick">Cancel</Button>
-            <Button Grid.Column="2" Margin="5" Command="{Binding SaveCommand}">Update</Button>-->
+            <!--<Button Grid.Column="1" Margin="5" Click="CancelClick">Cancel</Button>-->
+            <Button Grid.Column="2" Margin="5" Command="{Binding SaveCommand}" IsEnabled="{Binding UnsavedChanges}">Update</Button>
         </Grid>
     </Grid>
 </UserControl>

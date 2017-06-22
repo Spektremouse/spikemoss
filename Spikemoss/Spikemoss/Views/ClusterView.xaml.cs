@@ -21,12 +21,9 @@ namespace Spikemoss.Views
     /// </summary>
     public partial class ClusterView : UserControl
     {
-        private ClusterViewModel _viewModel;
-
         public ClusterView()
         {
             InitializeComponent();
-            _viewModel = this.DataContext as ClusterViewModel;
         }
     }
 }

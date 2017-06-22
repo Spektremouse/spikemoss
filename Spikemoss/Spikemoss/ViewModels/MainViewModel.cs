@@ -137,7 +137,27 @@ namespace Spikemoss.ViewModels
                 var tempCluster = message as ClusterViewModel;
                 if (ClusterList.Contains(tempCluster))
                 {
-
+                    foreach (var server in tempCluster.ServerList)
+                    {
+                        foreach (var clusterVm in ClusterList)
+                        {
+                            if (clusterVm.ID != tempCluster.ID)
+                            {
+                                var tempList = new List<ServerViewModel>();
+                                foreach (var serverDuplicate in clusterVm.ServerList)
+                                {
+                                    if (server.Server.ServerID == serverDuplicate.Server.ServerID)
+                                    {
+                                        tempList.Add(serverDuplicate);
+                                    }
+                                }
+                                foreach (var tempDuplicate in tempList)
+                                {
+                                    clusterVm.ServerList.Remove(tempDuplicate);
+                                }
+                            }                            
+                        }
+                    }
                 }
                 else if (!ClusterList.Contains(tempCluster))
                 {
@@ -159,7 +179,7 @@ namespace Spikemoss.ViewModels
                             }
                         }
                     }
-                    ClusterList.Add((ClusterViewModel)message);
+                    ClusterList.Add(tempCluster);
                 }
             }
         }
