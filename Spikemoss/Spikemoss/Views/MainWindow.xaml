@@ -74,8 +74,8 @@
                     <TabItem Header="Virtualization">
                     </TabItem>
                 </TabControl>
-                
-                <ContentControl Margin="30,0,0,0" Grid.Column="1" Grid.Row="1" Content="{Binding SelectedItem}" />
+
+                <ContentControl Margin="30,0,0,0" Grid.Column="1" Grid.Row="1" Content="{Binding SelectedItem}"/>
                 <Grid Grid.Column="0" Grid.Row="2">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="50*"/>

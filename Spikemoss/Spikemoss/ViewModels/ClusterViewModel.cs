@@ -17,7 +17,7 @@ namespace Spikemoss.ViewModels
 
         private IList<ServerViewModel> _serverListToLoad;
         private Cluster _cluster;
-        private ObservableCollection<ServerViewModel> _serverList;
+        private ObservableCollection<ServerViewModel> _serverViewModelList;
         private ObservableCollection<ServerViewModel> _listToFilter;
         private ObservableCollection<ServerViewModel> _filteredList;
 
@@ -29,7 +29,6 @@ namespace Spikemoss.ViewModels
         private bool _showPhysical = false;
         private bool _showVirtual = false;
         private bool _showUnknown = false;
-        private bool _changes = false;
 
         public event ErrorHandler ErrorOccurred;
         public event EventHandler SaveFinished;
@@ -37,29 +36,19 @@ namespace Spikemoss.ViewModels
         public ClusterViewModel()
         {
             ViewModelMediator.Instance.Register(this);
-            _serverList = new ObservableCollection<ServerViewModel>();
+            _serverViewModelList = new ObservableCollection<ServerViewModel>();
             _cluster = new Cluster();
-            if (_cluster.Name == "Unclustered")
-            {
-                HideAttachDetach = false;
-            }
         }
 
         public ClusterViewModel(Cluster cluster)
         {
             ViewModelMediator.Instance.Register(this);
-            _serverList = new ObservableCollection<ServerViewModel>();
+            _serverViewModelList = new ObservableCollection<ServerViewModel>();
             _cluster = cluster;
             if (_cluster.Name == "Unclustered")
             {
                 HideAttachDetach = false;
             }
-            this.PropertyChanged += ClusterViewModel_PropertyChanged;
-        }
-
-        private void ClusterViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            _changes = true;
         }
 
         public Cluster Cluster
@@ -71,8 +60,8 @@ namespace Spikemoss.ViewModels
         //The list of servers attached to the cluster
         public ObservableCollection<ServerViewModel> ServerList
         {
-            get { return _serverList; }
-            set { _serverList = value; OnPropertyChanged("ClusterList"); }
+            get { return _serverViewModelList; }
+            set { _serverViewModelList = value; OnPropertyChanged("ClusterList"); }
         }
 
         public ObservableCollection<ServerViewModel> FilteredServers
@@ -106,9 +95,11 @@ namespace Spikemoss.ViewModels
                     _listToFilter = new ObservableCollection<ServerViewModel>();
                     foreach (var server in DataAccessLayer.GetAllServers())
                     {
-
+                        if (server.ClusterID == 0)
+                        {
                             var serverVm = new ServerViewModel(server);
                             _listToFilter.Add(serverVm);
+                        }                            
                     }
                     _filteredList = _listToFilter;
                 }
@@ -133,12 +124,6 @@ namespace Spikemoss.ViewModels
         {
             get { return _cluster.Name; }
             set { _cluster.Name = value; OnPropertyChanged("Name"); }
-        }
-
-        public bool UnsavedChanges
-        {
-            get { return _changes; }
-            set { _changes = value; OnPropertyChanged("UnsavedChanges"); }
         }
 
         public bool ShowAll
@@ -205,7 +190,7 @@ namespace Spikemoss.ViewModels
                 {
                     DataAccessLayer.UpdateCluster(_cluster);
                 }
-                foreach (var serverVm in _serverList)
+                foreach (var serverVm in _serverViewModelList)
                 {
                     serverVm.Server.ClusterID = _cluster.ClusterID;
                     DataAccessLayer.UpdateServer(serverVm.Server);
@@ -318,6 +303,33 @@ namespace Spikemoss.ViewModels
             get { return new DelegateCommand(Detach); }
         }
 
+        public ICommand DeleteCommand
+        {
+            get { return new DelegateCommand(Delete); }
+        }
+
+        private void Delete()
+        {            
+            try
+            {
+                foreach (var serverVm in _serverViewModelList)
+                {
+                    serverVm.Server.ClusterID = 0;
+                    DataAccessLayer.UpdateServer(serverVm.Server);
+                }
+
+                DataAccessLayer.DeleteCluster(ID);
+                ID = 0;
+                ViewModelMediator.Instance.Unregister(this);
+                SendMessage(ViewModelMediator.Instance, this);
+            }        
+            catch (Exception ex)
+            {
+                ErrorMessage = "Error deleting cluster. " + ex.Message;
+                ErrorOccurred(this, new EventArgs());
+            }            
+        }
+
         public string ErrorMessage
         {
             get
@@ -353,9 +365,10 @@ namespace Spikemoss.ViewModels
                     string tempMessage = message as string;
                     if (tempMessage == LOAD_COMPLETE_MESSAGE)
                     {
+                        //null ref err on config import
                         foreach (var serverVM in _serverListToLoad)
                         {
-                            _serverList.Add(serverVM);
+                            _serverViewModelList.Add(serverVM);
                         }
                     }
                 }

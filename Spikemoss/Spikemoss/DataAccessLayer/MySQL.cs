@@ -266,6 +266,16 @@ namespace Spikemoss.DataAccessLayer
 
         public void DeleteCluster(int id)
         {
+            using (var con = new MySqlConnection(ConnectionString))
+            {
+                con.Open();
+                string query = "DELETE FROM cluster "
+                        + "WHERE ClusterID=@ClusterID;";
+                var cmd = new MySqlCommand(query, con);
+                cmd.Parameters.AddWithValue("@ClusterID", id);
+
+                cmd.ExecuteNonQuery();
+            }
         }
 
         public Cluster GetCluster(int id)

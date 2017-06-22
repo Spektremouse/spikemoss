@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:Spikemoss.Views"
              xmlns:viewmodel="clr-namespace:Spikemoss.ViewModels"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="500">
+             d:DesignHeight="300" d:DesignWidth="500" Loaded="UserControl_Loaded">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="2*"/>
@@ -20,7 +20,7 @@
                 <ColumnDefinition Width="207*"/>
             </Grid.ColumnDefinitions>
             <Label Grid.Column="0" VerticalAlignment="Center" Height="26" Margin="0,3">Cluster Name:</Label>
-            <TextBox Grid.Column="1" VerticalAlignment="Center" Height="24" Margin="0,4,245,4" Text="{Binding Name}" IsReadOnly="{Binding ReadOnlyName}"></TextBox>
+            <TextBox Grid.Column="1" VerticalAlignment="Center" Height="24" Margin="0,4,300,4" Text="{Binding Name}" IsReadOnly="{Binding ReadOnlyName}"></TextBox>
         </Grid>
         <StackPanel Grid.Row="1">
             <StackPanel Orientation="Horizontal">
@@ -59,6 +59,8 @@
                     <DataTemplate DataType="{x:Type viewmodel:ServerViewModel}">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="{Binding Address}"/>
+                            <TextBlock Text=" - "/>
+                            <TextBlock Text="{Binding Hostname}"/>
                         </StackPanel>
                     </DataTemplate>
                 </ListBox.Resources>
@@ -70,8 +72,8 @@
                 <ColumnDefinition Width="53*"/>
                 <ColumnDefinition Width="53*"/>
             </Grid.ColumnDefinitions>
-            <!--<Button Grid.Column="1" Margin="5" Click="CancelClick">Cancel</Button>-->
-            <Button Grid.Column="2" Margin="5" Command="{Binding SaveCommand}" IsEnabled="{Binding UnsavedChanges}">Update</Button>
+            <Button Grid.Column="1" Margin="1,5,0,5" Height="30" Command="{Binding DeleteCommand}" IsEnabled="{Binding HideAttachDetach}">Delete</Button>
+            <Button Grid.Column="2" Margin="5,5,0,5" Height="30" Command="{Binding SaveCommand}" IsEnabled="{Binding HideAttachDetach}">Update</Button>
         </Grid>
     </Grid>
 </UserControl>

@@ -21,9 +21,23 @@ namespace Spikemoss.Views
     /// </summary>
     public partial class ClusterView : UserControl
     {
+        private ClusterViewModel vm;
+
         public ClusterView()
         {
             InitializeComponent();
+        }
+
+        private void Vm_ErrorOccurred(object sender, EventArgs e)
+        {
+            var errWin = new ErrorWindow(vm);
+            errWin.ShowDialog();
+        }
+
+        private void UserControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            vm = this.DataContext as ClusterViewModel;
+            vm.ErrorOccurred += Vm_ErrorOccurred;
         }
     }
 }
