@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Spikemoss.DataAccessLayer;
 using Spikemoss.Models;
 using System.Collections.ObjectModel;
+using System.Net;
 
 namespace Spikemoss.ViewModels
 {
@@ -14,12 +15,15 @@ namespace Spikemoss.ViewModels
         private const string UNCLUSTERED_NAME = "Unclusterd";
         private const string ERR_EMPTY_CLUSTER_NAME = "Cluster name cannot be empty.";
         private const string ERR_DUPLICATE_CLUSTER_NAME = "A Cluster named {0} already exists. Please enter a unique name.";
+        private const string ERR_EMPTY_HOSTNAME_ADDRESS = "Please enter an Address or Hostname.";
+        private const string ERR_INVALID_HOSTNAME_ADDRESS = "Please enter a valid Hostname or Address.";
+
         private static RepositoryHelper _instance;
         private IDataAccessLayer _idal;
 
         private ObservableCollection<ClusterViewModel> _clusterList = new ObservableCollection<ClusterViewModel>();
         private ObservableCollection<ServerViewModel> _serverList = new ObservableCollection<ServerViewModel>();
-        //private ObservableCollection<User> _userList = new ObservableCollection<User>();
+        private ObservableCollection<UserViewModel> _userList = new ObservableCollection<UserViewModel>();
         //private ObservableCollection<Hardware> _hardwareList = new ObservableCollection<Hardware>();
 
         //Used internally to ensure thready safety by locking a private object
@@ -57,13 +61,20 @@ namespace Spikemoss.ViewModels
             get { return _serverList; }
         }
 
+        public ObservableCollection<UserViewModel> Users
+        {
+            get { return _userList; }
+        }
+
         public void Load()
         {
             _clusterList.Clear();
             _serverList.Clear();
             LoadClusters();            
             LoadServers();
-            LoadClusterServerList();
+            LoadUsers();
+            LoadClusterServerList();            
+            LoadServerUsers();
         }
 
         public void Save(ClusterViewModel clusterVm)
@@ -87,19 +98,6 @@ namespace Spikemoss.ViewModels
             }            
         }
 
-        public void Delete(ClusterViewModel clusterVm)
-        {
-            var unclustered = _clusterList.Single(tmpCluster => tmpCluster.ClusterID == 0);
-            foreach (var serverVm in clusterVm.ServerList)
-            {
-                serverVm.Server.ClusterID = 0;
-                _idal.UpdateServer(serverVm.Server);                
-                unclustered.ServerList.Add(serverVm);
-            }
-            _idal.DeleteCluster(clusterVm.ClusterID);
-            _clusterList.Remove(clusterVm);
-        }
-
         public void Save(ServerViewModel serverVm)
         {
             if (Validate(serverVm))
@@ -116,19 +114,42 @@ namespace Spikemoss.ViewModels
                     _idal.InsertServer(server);
                     serverVm = new ServerViewModel(server);
                     _serverList.Add(serverVm);
+                    var cluster = _clusterList.SingleOrDefault(tmpCluster => tmpCluster.ClusterID == serverVm.ClusterID);
+                    cluster.ServerList.Add(serverVm);
                 }
                 else
                 {
                     _idal.UpdateServer(server);
-                }                
+                }
             }
         }
 
-        public void InsertUser(User user)
+        public void Save(User user)
         {
             _idal.InsertUser(user);
             var userVm = new UserViewModel(user);
         }
+
+        public void Delete(ClusterViewModel clusterVm)
+        {
+            var unclustered = _clusterList.Single(tmpCluster => tmpCluster.ClusterID == 0);
+            foreach (var serverVm in clusterVm.ServerList)
+            {
+                serverVm.Server.ClusterID = 0;
+                _idal.UpdateServer(serverVm.Server);                
+                unclustered.ServerList.Add(serverVm);
+            }
+            _idal.DeleteCluster(clusterVm.ClusterID);
+            _clusterList.Remove(clusterVm);
+        }                
+
+        private void GetMemento(ClusterViewModel clusterVm) { }
+
+        private void GetMemento(ServerViewModel serverVm) { }
+
+        private void GetMemento(UserViewModel userVm) { }
+
+        //private void GetMemento(HardwareViewModel hardwareVm) { }
 
         private void LoadClusters()
         {
@@ -164,9 +185,25 @@ namespace Spikemoss.ViewModels
             }
         }
 
-        private void LoadServerVirtualGuests() { }
+        private void LoadServerUsers()
+        {
+            foreach (var serverVm in _serverList)
+            {
+                var user = _userList.SingleOrDefault(tmpUser => tmpUser.UserID == serverVm.User.UserID);
+                serverVm.User = user;
+            }
+        }
 
-        private void LoadUsers() { }
+        private void LoadServerVirtualGuests() { }        
+
+        private void LoadUsers()
+        {
+            foreach (var user in _idal.GetAllUsers())
+            {
+                var userVm = new UserViewModel(user);
+                _userList.Add(userVm);
+            }
+        }
 
         private void LoadHardware() { }
 
@@ -194,8 +231,42 @@ namespace Spikemoss.ViewModels
             return true;
         }
 
-        private bool Validate(ServerViewModel serverVm) { return true; }
+        private bool Validate(ServerViewModel serverVm)
+        {
+            if (String.IsNullOrWhiteSpace(serverVm.Hostname) && String.IsNullOrWhiteSpace(serverVm.Address))
+            {
+                GetMemento(serverVm);
+                throw new ArgumentException(ERR_EMPTY_HOSTNAME_ADDRESS);
+            }
+            else if (String.IsNullOrWhiteSpace(serverVm.Hostname) && serverVm.Address == "0.0.0.0")
+            {
+                GetMemento(serverVm);
+                throw new ArgumentException(ERR_EMPTY_HOSTNAME_ADDRESS);
+            }
+            var hostname = Uri.CheckHostName(serverVm.Hostname);            
+            if (hostname == UriHostNameType.Basic || hostname == UriHostNameType.Unknown && !ValidateIPv4(serverVm.Address))
+            {
+                throw new ArgumentException(ERR_INVALID_HOSTNAME_ADDRESS);
+            }
+            return true;
+        }
 
-        private void GetMemento(ClusterViewModel clusterVm) { }
+        private bool ValidateIPv4(string ipString)
+        {
+            if (String.IsNullOrWhiteSpace(ipString))
+            {
+                return false;
+            }
+
+            string[] splitValues = ipString.Split('.');
+            if (splitValues.Length != 4)
+            {
+                return false;
+            }
+
+            byte tempForParsing;
+
+            return splitValues.All(r => byte.TryParse(r, out tempForParsing));
+        }
     }
 }

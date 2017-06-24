@@ -1,0 +1,74 @@
+﻿<Window x:Class="Spikemoss.Views.AddServerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Spikemoss.Views"
+        xmlns:viewmodel="clr-namespace:Spikemoss.ViewModels"
+        mc:Ignorable="d"
+        Title="AddServerWindow" Height="415" Width="325" ResizeMode="NoResize" WindowStartupLocation="CenterOwner" WindowStyle="ToolWindow" Closed="Window_Closed">
+    <Window.DataContext>
+        <viewmodel:ServerViewModel/>
+    </Window.DataContext>
+
+    <Window.Resources>
+        <DataTemplate DataType="{x:Type viewmodel:UserViewModel}">
+            <local:UserView/>
+        </DataTemplate>
+    </Window.Resources>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="4*"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Label Grid.Column="0" Grid.Row="0" VerticalAlignment="Center">Address</Label>
+            <TextBox Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" Text="{Binding Address}" MaxLength="15"></TextBox>
+            <Label Grid.Column="0" Grid.Row="1" VerticalAlignment="Center">Hostname</Label>
+            <TextBox Grid.Column="1" Grid.Row="1" VerticalAlignment="Center" Text="{Binding Hostname}" MaxLength="255"></TextBox>
+            <Label Grid.Column="0" Grid.Row="2" VerticalAlignment="Center">Operating System</Label>
+            <ComboBox Grid.Column="1" Grid.Row="2" VerticalAlignment="Center" SelectedIndex="{Binding OperatingSystem}">
+                <ComboBoxItem>Unknown</ComboBoxItem>
+                <ComboBoxItem>Windows</ComboBoxItem>
+                <ComboBoxItem>Linux</ComboBoxItem>
+                <ComboBoxItem>AIX</ComboBoxItem>
+                <ComboBoxItem>Solaris</ComboBoxItem>
+                <ComboBoxItem>HPUX</ComboBoxItem>
+            </ComboBox>
+            <Label Grid.Column="0" Grid.Row="3" VerticalAlignment="Center">Server Type</Label>
+            <ComboBox Grid.Column="1" Grid.Row="3" VerticalAlignment="Center" SelectedIndex="{Binding ServerType}">
+                <ComboBoxItem>Unknown</ComboBoxItem>
+                <ComboBoxItem>Physical</ComboBoxItem>
+                <ComboBoxItem>Virtual</ComboBoxItem>
+            </ComboBox>
+            <Label Grid.Column="0" Grid.Row="4" VerticalAlignment="Center">SSHPort</Label>
+            <TextBox Grid.Column="1" Grid.Row="4" VerticalAlignment="Center" Text="{Binding SSHPort}" MaxLength="5" PreviewTextInput="PortPreviewTextInput"></TextBox>
+            
+        </Grid>
+        <Grid Grid.Row="1">
+            <ContentControl Content="{Binding User}"/>
+        </Grid>
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0" Click="CancelClick" Margin="10,14">Cancel</Button>
+            <Button Grid.Column="1" Margin="10,14" Command="{Binding SaveCommand}">Save</Button>
+        </Grid>
+
+    </Grid>
+</Window>

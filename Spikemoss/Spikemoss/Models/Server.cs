@@ -11,8 +11,8 @@ namespace Spikemoss.Models
         private int _serverID = 0;
         private int _sshPort = 22;
         private int _virtualHostID = 0;        
-        private string _error;
-        private string _hostname;
+        private string _error = "";
+        private string _hostname = "";
         private OperatingSystemType _operatingSystem = OperatingSystemType.Unknown;
         private ServerType _serverType = ServerType.Unknown;     
         private Hardware _hardware;
@@ -65,7 +65,17 @@ namespace Spikemoss.Models
 
         public string Address
         {
-            get { return _address.ToString(); }
+            get
+            {
+                if (_address != null)
+                {
+                    return _address.ToString();
+                }
+                else
+                {
+                    return "0.0.0.0";
+                }                
+            }
             set { _address = IPAddress.Parse(value); }
         }
 

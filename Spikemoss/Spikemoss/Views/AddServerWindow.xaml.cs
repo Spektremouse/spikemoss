@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -16,17 +17,17 @@ using System.Windows.Shapes;
 namespace Spikemoss.Views
 {
     /// <summary>
-    /// Interaction logic for AddClusterWindow.xaml
+    /// Interaction logic for AddServerWindow.xaml
     /// </summary>
-    public partial class AddClusterWindow : Window
+    public partial class AddServerWindow : Window
     {
-        private ClusterViewModel _viewModel;
+        private ServerViewModel _viewModel;
 
-        public AddClusterWindow(MainWindow owner)
+        public AddServerWindow(MainWindow owner)
         {
             InitializeComponent();
             this.Owner = owner;
-            _viewModel = this.DataContext as ClusterViewModel;
+            _viewModel = this.DataContext as ServerViewModel;
             _viewModel.ErrorOccurred += OnErrorOccurred;
             _viewModel.SaveFinished += OnSaveFinished;
         }
@@ -42,15 +43,21 @@ namespace Spikemoss.Views
             errWin.ShowDialog();
         }
 
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            _viewModel.ErrorOccurred -= OnErrorOccurred;
+            _viewModel.SaveFinished -= OnSaveFinished;
+        }
+
         private void CancelClick(object sender, RoutedEventArgs e)
         {
             this.Close();
         }
 
-        private void Window_Closed(object sender, EventArgs e)
+        private void PortPreviewTextInput(object sender, TextCompositionEventArgs e)
         {
-            _viewModel.ErrorOccurred -= OnErrorOccurred;
-            _viewModel.SaveFinished -= OnSaveFinished;
+            var regex = new Regex("[^0-9]+");
+            e.Handled = regex.IsMatch(e.Text);
         }
     }
 }

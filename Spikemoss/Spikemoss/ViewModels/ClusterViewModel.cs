@@ -84,11 +84,15 @@ namespace Spikemoss.ViewModels
         {
             get
             {
-                return new ObservableCollection<ServerViewModel>
+                if (_filteredList == null)
+                {
+                    _filteredList = new ObservableCollection<ServerViewModel>
                         (
                         RepositoryHelper.Instance.Servers.Where(server =>
                         server.ClusterID != _cluster.ClusterID && server.ClusterID == 0)
                         );
+                }
+                return _filteredList;
             }
             set { _filteredList = value; OnPropertyChanged("FilteredServers"); } 
         }
@@ -108,31 +112,44 @@ namespace Spikemoss.ViewModels
         public bool ShowAll
         {
             get { return _showAll; }
-            set { _showAll = value; OnPropertyChanged("ShowAll"); FilterChanged(); }
+            set { _showAll = value; OnPropertyChanged("ShowAll"); FilteredServers = new ObservableCollection<ServerViewModel>
+                        (
+                        RepositoryHelper.Instance.Servers.Where(server =>
+                        server.ClusterID != _cluster.ClusterID && server.ClusterID == 0)
+                        );
+            }
         }
 
         public bool ShowPhysical
         {
             get { return _showPhysical; }
-            set { _showPhysical = value; OnPropertyChanged("ShowPhysical"); FilterChanged(); }
+            set { _showPhysical = value; OnPropertyChanged("ShowPhysical"); FilteredServers = new ObservableCollection<ServerViewModel>(RepositoryHelper.Instance.Servers.Where(server =>
+                server.ServerType == (int)ServerType.Physical && server.ClusterID != this.ClusterID));
+            }
         }
 
         public bool ShowVirtual
         {
             get { return _showVirtual; }
-            set { _showVirtual = value; OnPropertyChanged("ShowVirtual"); FilterChanged(); }
+            set { _showVirtual = value; OnPropertyChanged("ShowVirtual"); FilteredServers = new ObservableCollection<ServerViewModel>(RepositoryHelper.Instance.Servers.Where(server =>
+                server.ServerType == (int)ServerType.Virtual && server.ClusterID != this.ClusterID));
+            }
         }
 
         public bool ShowUnknown
         {
             get { return _showUnknown; }
-            set { _showUnknown = value; OnPropertyChanged("ShowUnknown"); FilterChanged(); }
+            set { _showUnknown = value; OnPropertyChanged("ShowUnknown"); FilteredServers = new ObservableCollection<ServerViewModel>(RepositoryHelper.Instance.Servers.Where(server =>
+                server.ServerType == (int)ServerType.Unknown));
+            }
         }
 
         public string SearchText
         {
             get { return _searchText; }
-            set { _searchText = value; OnPropertyChanged("SearchText"); FilterChanged(); }
+            set { _searchText = value; OnPropertyChanged("SearchText"); FilteredServers = new ObservableCollection<ServerViewModel>(RepositoryHelper.Instance.Servers.Where(server =>
+                server.Address.Contains(SearchText) || server.Hostname.Contains(SearchText)));
+            }
         }
 
         public bool HideAttachDetach
@@ -262,34 +279,6 @@ namespace Spikemoss.ViewModels
         public void SendMessage(IMediator mediator, object message)
         {
             mediator.DistributeMessage(this, message);
-        }
-
-        private void FilterChanged()
-        {
-            if (ShowAll == true)
-            {
-                FilteredServers = FilteredServers;
-            }
-            if (ShowPhysical == true)
-            {
-                FilteredServers = new ObservableCollection<ServerViewModel>(FilteredServers.Where(server =>
-                server.ServerType == (int)ServerType.Physical));
-            }
-            if (ShowVirtual == true)
-            {
-                FilteredServers = new ObservableCollection<ServerViewModel>(FilteredServers.Where(server =>
-                server.ServerType == (int)ServerType.Virtual));
-            }
-            if (ShowUnknown == true)
-            {
-                FilteredServers = new ObservableCollection<ServerViewModel>(FilteredServers.Where(server =>
-                server.ServerType == (int)ServerType.Unknown));
-            }
-            if (!String.IsNullOrWhiteSpace(SearchText))
-            {
-                FilteredServers = new ObservableCollection<ServerViewModel>(FilteredServers.Where(server =>
-                server.Address.Contains(SearchText) || server.Hostname.Contains(SearchText)));
-            }
         }
     }
 }

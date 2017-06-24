@@ -7,7 +7,7 @@
         xmlns:viewmodel="clr-namespace:Spikemoss.ViewModels"
         mc:Ignorable="d"
         Title="Spikemoss" Height="600" Width="1024" Loaded="MainWindowLoaded">
-    
+
     <Window.Resources>
         <DataTemplate DataType="{x:Type viewmodel:ClusterViewModel}">
             <local:ClusterView/>
@@ -16,8 +16,8 @@
             <local:ServerView />
         </DataTemplate>
     </Window.Resources>
-    <!--Main menu bar-->
     <DockPanel>
+        <!--Main menu bar-->
         <Menu DockPanel.Dock="Top" Margin="0,0,0,5">
             <MenuItem Header="File">
                 <MenuItem Header="Import Configuration" Click="ImportConfigurationClick"/>
@@ -82,7 +82,7 @@
                         <ColumnDefinition Width="50*"/>
                     </Grid.ColumnDefinitions>
                     <Button Grid.Column="0" Margin="5" Height="30" Click="AddClusterClick">Add Cluster</Button>
-                    <Button Grid.Column="1" Margin="5" Height="30">Add Server</Button>
+                    <Button Grid.Column="1" Margin="5" Height="30" Click="AddServerClick">Add Server</Button>
                 </Grid>
 
             </Grid>
